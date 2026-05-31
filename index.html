@@ -1,0 +1,892 @@
+<html lang="pt-BR"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OfertaZap — As melhores ofertas Shopee</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&amp;family=DM+Sans:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  --laranja:#EE4D2D;--laranja-escuro:#c73e22;--laranja-claro:#fff3f0;
+  --preto:#0f0f0f;--cinza:#f7f7f5;--cinza-medio:#e8e8e5;
+  --texto:#1a1a1a;--texto-muted:#6b6b6b;--branco:#ffffff;
+  --radius:14px;--radius-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--cinza);color:var(--texto);min-height:100vh}
+
+header{background:var(--preto);padding:0 2rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--branco);letter-spacing:-0.5px}
+.logo span{color:var(--laranja)}
+nav{display:flex;gap:1.5rem;align-items:center}
+nav a{color:rgba(255,255,255,0.65);text-decoration:none;font-size:.9rem;font-weight:400;transition:color .2s}
+nav a:hover{color:var(--branco)}
+.nav-cta{background:var(--laranja);color:var(--branco)!important;padding:8px 18px;border-radius:100px;font-weight:500!important;font-size:.85rem!important;transition:background .2s!important}
+.nav-cta:hover{background:var(--laranja-escuro)!important}
+
+.hero{background:var(--preto);padding:4rem 2rem 3.5rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(238,77,45,.25) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(238,77,45,.15);border:1px solid rgba(238,77,45,.3);color:#ff7a5a;font-size:.78rem;font-weight:500;padding:5px 14px;border-radius:100px;margin-bottom:1.5rem;letter-spacing:.5px;text-transform:uppercase}
+.hero-badge::before{content:'🔥'}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;color:var(--branco);line-height:1.1;margin-bottom:1rem;letter-spacing:-1px}
+.hero h1 em{color:var(--laranja);font-style:normal}
+.hero p{color:rgba(255,255,255,.55);font-size:1.05rem;max-width:500px;margin:0 auto 2rem;line-height:1.6}
+.hero-stats{display:flex;justify-content:center;gap:2.5rem;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:700;color:var(--branco)}
+.stat-label{font-size:.8rem;color:rgba(255,255,255,.4);margin-top:2px}
+
+.filtro-bar{background:var(--branco);border-bottom:1px solid var(--cinza-medio);padding:.75rem 2rem;display:flex;align-items:center;gap:.75rem;overflow-x:auto;scrollbar-width:none}
+.filtro-bar::-webkit-scrollbar{display:none}
+.filtro-label{font-size:.8rem;color:var(--texto-muted);white-space:nowrap;font-weight:500;margin-right:4px}
+.filtro-btn{border:1px solid var(--cinza-medio);background:var(--branco);color:var(--texto);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:6px 14px;border-radius:100px;cursor:pointer;white-space:nowrap;transition:all .2s;font-weight:400}
+.filtro-btn:hover,.filtro-btn.ativo{background:var(--laranja);border-color:var(--laranja);color:var(--branco)}
+
+main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
+.section-title{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:700;color:var(--texto);margin-bottom:1.5rem;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:var(--cinza-medio)}
+.grid-produtos{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.25rem}
+
+.card-produto{background:var(--branco);border-radius:var(--radius);overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer;position:relative;display:flex;flex-direction:column}
+.card-produto:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+.card-img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--cinza);display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;overflow:hidden}
+.card-img img{width:100%;height:100%;object-fit:cover}
+.emoji-placeholder{font-size:4rem;user-select:none}
+.badge-desconto{position:absolute;top:10px;left:10px;background:var(--laranja);color:var(--branco);font-size:.72rem;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:.3px}
+.badge-frete{position:absolute;top:10px;right:10px;font-size:.68rem;font-weight:600;padding:3px 8px;border-radius:6px}
+.frete-gratis{background:#00b14f;color:var(--branco)}
+.frete-cupom{background:#f59e0b;color:#fff}
+.card-info{padding:1rem;flex:1;display:flex;flex-direction:column}
+.card-categoria{font-size:.72rem;color:var(--texto-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:500}
+.card-nome{font-size:.9rem;font-weight:500;color:var(--texto);line-height:1.45;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-precos{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+.preco-atual{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:var(--laranja)}
+.preco-original{font-size:.8rem;color:var(--texto-muted);text-decoration:line-through}
+.card-estrelas{display:flex;align-items:center;gap:4px;font-size:.78rem;color:var(--texto-muted);margin-bottom:14px}
+.estrelas{color:#fbbf24;letter-spacing:-1px}
+.btn-comprar{display:block;width:100%;background:var(--laranja);color:var(--branco);border:none;border-radius:10px;padding:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;text-align:center;text-decoration:none;transition:background .2s;margin-top:auto}
+.btn-comprar:hover{background:var(--laranja-escuro)}
+
+/* CHAT */
+#chat-widget{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end}
+#chat-box{width:360px;background:var(--branco);border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.18);overflow:hidden;display:none;flex-direction:column;margin-bottom:12px;max-height:520px}
+#chat-box.aberto{display:flex}
+.chat-header{background:var(--laranja);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.chat-header-info{display:flex;align-items:center;gap:10px}
+.chat-avatar{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.chat-nome{font-weight:600;color:var(--branco);font-size:.9rem}
+.chat-status{font-size:.72rem;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:4px}
+.dot-online{width:6px;height:6px;background:#a3ffcb;border-radius:50%}
+.chat-close{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;font-size:1.3rem;line-height:1;transition:color .2s}
+.chat-close:hover{color:var(--branco)}
+#chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fafaf9;min-height:280px;max-height:340px}
+.msg{max-width:82%;font-size:.86rem;line-height:1.5;padding:9px 13px;border-radius:14px;word-break:break-word}
+.msg-bot{background:var(--branco);color:var(--texto);align-self:flex-start;border:1px solid var(--cinza-medio);border-bottom-left-radius:4px}
+.msg-user{background:var(--laranja);color:var(--branco);align-self:flex-end;border-bottom-right-radius:4px}
+.msg-typing{background:var(--branco);color:var(--texto-muted);align-self:flex-start;border:1px solid var(--cinza-medio);font-style:italic;font-size:.8rem}
+.chat-input-area{display:flex;gap:8px;padding:12px;border-top:1px solid var(--cinza-medio);background:var(--branco)}
+#chat-input{flex:1;border:1px solid var(--cinza-medio);border-radius:100px;padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;color:var(--texto);transition:border-color .2s}
+#chat-input:focus{border-color:var(--laranja)}
+#btn-enviar{background:var(--laranja);border:none;border-radius:50%;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+#btn-enviar:hover{background:var(--laranja-escuro)}
+#btn-enviar svg{width:16px;height:16px;fill:none;stroke:white;stroke-width:2}
+#chat-toggle{width:58px;height:58px;background:var(--laranja);border:none;border-radius:50%;cursor:pointer;box-shadow:0 4px 20px rgba(238,77,45,.45);display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s;position:relative}
+#chat-toggle:hover{transform:scale(1.08);background:var(--laranja-escuro)}
+#chat-toggle svg{width:26px;height:26px;fill:none;stroke:white;stroke-width:2}
+.notif-badge{position:absolute;top:2px;right:2px;width:16px;height:16px;background:#22c55e;border-radius:50%;border:2px solid white;display:block}
+
+/* ADMIN - área secreta invisível (5 cliques para ativar) */
+#admin-trigger{position:fixed;bottom:0;left:0;width:60px;height:60px;background:transparent;border:none;cursor:default;z-index:999;opacity:0}
+
+/* MODAL LOGIN */
+#modal-login,#modal-admin{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;padding:1rem}
+#modal-login.aberto,#modal-admin.aberto{display:flex}
+.modal-box{background:var(--branco);border-radius:20px;padding:2rem;width:100%;max-width:400px}
+.modal-box-lg{max-width:580px;max-height:90vh;overflow-y:auto}
+.modal-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center}
+.modal-close{background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--texto-muted)}
+.login-icon{text-align:center;font-size:2.5rem;margin-bottom:1rem}
+.login-desc{text-align:center;color:var(--texto-muted);font-size:.88rem;margin-bottom:1.5rem}
+.shake{animation:shake .3s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.form-grupo{margin-bottom:1rem}
+.form-grupo label{display:block;font-size:.82rem;font-weight:500;color:var(--texto-muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px}
+.form-grupo input,.form-grupo select,.form-grupo textarea{width:100%;border:1px solid var(--cinza-medio);border-radius:10px;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--texto);outline:none;transition:border-color .2s;background:var(--branco)}
+.form-grupo input:focus,.form-grupo select:focus,.form-grupo textarea:focus{border-color:var(--laranja)}
+.form-linha{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.btn-salvar{width:100%;background:var(--laranja);color:var(--branco);border:none;border-radius:12px;padding:13px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .2s}
+.btn-salvar:hover{background:var(--laranja-escuro)}
+.config-section{border-top:1px solid var(--cinza-medio);padding-top:1.5rem;margin-top:1.5rem}
+.config-section-title{font-size:.82rem;font-weight:600;color:var(--texto-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1rem}
+.lista-produtos-admin{display:flex;flex-direction:column;gap:8px;margin-top:1rem}
+.item-admin{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--cinza);border-radius:10px;font-size:.85rem}
+.item-admin span{font-weight:500}
+.btn-del{background:none;border:none;cursor:pointer;color:#dc2626;font-size:1rem;padding:2px 6px;border-radius:6px;transition:background .2s}
+.btn-del:hover{background:#fee2e2}
+.admin-logout{background:none;border:1px solid var(--cinza-medio);color:var(--texto-muted);font-family:'DM Sans',sans-serif;font-size:.8rem;padding:6px 14px;border-radius:100px;cursor:pointer;transition:all .2s}
+.admin-logout:hover{border-color:#dc2626;color:#dc2626}
+.info-box{background:#fff8f0;border:1px solid #fde8d8;border-radius:10px;padding:12px 14px;font-size:.82rem;color:#92400e;margin-bottom:1rem;line-height:1.5}
+
+@media(max-width:600px){
+  header{padding:0 1rem}
+  main{padding:1.5rem 1rem 5rem}
+  .hero{padding:2.5rem 1rem 2rem}
+  .grid-produtos{grid-template-columns:repeat(2,1fr);gap:.75rem}
+  #chat-box{width:calc(100vw - 32px)}
+  nav a:not(.nav-cta){display:none}
+  .form-linha{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Oferta<span>Zap</span></div>
+  <nav>
+    <a href="#produtos">Ofertas</a>
+    <a href="#" class="nav-cta" onclick="toggleChat();return false">💬 Fale com IA</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">Afiliado Shopee Oficial</div>
+  <h1>Melhores ofertas<br>em <em>um só lugar</em></h1>
+  <p>Produtos selecionados com os melhores preços da Shopee. Nossa IA te ajuda a encontrar o que você precisa.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num" id="stat-produtos">16</div><div class="stat-label">produtos</div></div>
+    <div class="stat"><div class="stat-num">Até 80%</div><div class="stat-label">de desconto</div></div>
+    <div class="stat"><div class="stat-num">Frete</div><div class="stat-label">grátis em muitos</div></div>
+  </div>
+</div>
+
+<div class="filtro-bar">
+  <span class="filtro-label">Filtrar:</span>
+  <button class="filtro-btn ativo" onclick="filtrar('todos',this)">Todos</button>
+  <button class="filtro-btn" onclick="filtrar('eletronicos',this)">Eletrônicos</button>
+  <button class="filtro-btn" onclick="filtrar('moda',this)">Moda</button>
+  <button class="filtro-btn" onclick="filtrar('casa',this)">Casa</button>
+  <button class="filtro-btn" onclick="filtrar('beleza',this)">Beleza</button>
+  <button class="filtro-btn" onclick="filtrar('esporte',this)">Esporte</button>
+  <button class="filtro-btn" onclick="filtrar('infantil',this)">Infantil</button>
+</div>
+
+<main id="produtos">
+  <div class="section-title">🔥 Ofertas em destaque</div>
+  <div class="grid-produtos" id="grid-produtos"><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-br.img.susercontent.com/file/sg-11134201-81zua-mmzww7t14r9fc6@resize_w900_nl.webp" alt="Bandeira Do Brasil Grande 150x90cm Copa Do Mundo Para Bastão" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-57%</span>
+        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Bandeira Do Brasil Grande 150x90cm Copa Do Mundo Para Bastão</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 29,90</span>
+          <span class="preco-original">R$ 69,99</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.9 (525)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/W3vC2gVQi" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-br.img.susercontent.com/file/br-11134207-820mc-mnhk2wuajocgc3@resize_w900_nl.webp" alt="TOALHA DE MESA COPA DO MUNDO BRASIL FUTEBOL 2,20M x 1,50M PARA 8 CADEIRAS" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        
+        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">TOALHA DE MESA COPA DO MUNDO BRASIL FUTEBOL 2,20M x 1,50M PARA 8 CADEIRAS</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 42,38</span>
+          
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.8 (457)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/3VhWkpw3w3" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-br.img.susercontent.com/file/br-11134207-820m7-mo774inyysqq7b@resize_w900_nl.webp" alt="Kit com 3/5/10/12 Pacotes de Figurinha Álbum Copa do Mundo" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        
+        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Kit com 3/5/10/12 Pacotes de Figurinha Álbum Copa do Mundo</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 21,39</span>
+          <span class="preco-original">R$ 21,46</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.9 (856)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/60OrjAt0aT" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-br.img.susercontent.com/file/br-11134207-820m8-mntyzxvlmo021e.webp" alt="12 Adesivos Strass Tatoo Maquiagem Rosto Jogos Copa do Mundo Brasil Bandeira Futebol Adesivo De Pedrinhas Brilhantes" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-60%</span>
+        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">12 Adesivos Strass Tatoo Maquiagem Rosto Jogos Copa do Mundo Brasil Bandeira Futebol Adesivo De Pedrinhas Brilhantes</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 19,90</span>
+          <span class="preco-original">R$ 49,90</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★</span>
+          <span>3 (840)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/7KuFJ8rFdR" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-br.img.susercontent.com/file/br-11134207-820m6-mnr4x4e2egaq5d.webp" alt="Kit 6 Vuvuzelas Bandeira do Brasil Grande Com Apito | Corneta Torcida Copa do Mundo Brasil" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-73%</span>
+        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Kit 6 Vuvuzelas Bandeira do Brasil Grande Com Apito | Corneta Torcida Copa do Mundo Brasil</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 10,99</span>
+          <span class="preco-original">R$ 39,99</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.6 (345)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/W3vAQD7nn" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-br.img.susercontent.com/file/br-11134207-81ztc-mjdiz80id9mq46@resize_w900_nl.webp" alt="Body Bebê Copa - Brasil - Menino Menina/ Body Bebê Verde e Amarelo Mesverário Brasil Brasileiro" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-63%</span>
+        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Body Bebê Copa - Brasil - Menino Menina/ Body Bebê Verde e Amarelo Mesverário Brasil Brasileiro</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 22,66</span>
+          <span class="preco-original">R$ 61,79</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★★</span>
+          <span>5 (943)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/3LO6VvUigx" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-bs-br.img.susercontent.com/br-11134207-820ls-mmkdr4curc3q5e.webp" alt="Conjunto Feminino Brasil Cropped Alcinha Calça Flare Cintura Alta Look Copa Casual" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-50%</span>
+        <span class="badge-frete frete-gratis">Frete grátis</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Conjunto Feminino Brasil Cropped Alcinha Calça Flare Cintura Alta Look Copa Casual</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 69,90</span>
+          <span class="preco-original">R$ 139,80</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.9 (971)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/AUrH2vDF5C" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-br.img.susercontent.com/file/br-11134207-820l4-mnbl40wm9ds427@resize_w900_nl.webp" alt="Camiseta do Brasil Infantil Unissex Personalizada Minha Copa Malha 100% Algodão Estampa Em DTF" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-3%</span>
+        <span class="badge-frete frete-gratis">Frete grátis</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Camiseta do Brasil Infantil Unissex Personalizada Minha Copa Malha 100% Algodão Estampa Em DTF</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 28,90</span>
+          <span class="preco-original">R$ 29,90</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.8 (962)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/2LVZJkh0eb" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-br.img.susercontent.com/file/sg-11134201-8262o-mmfcxooc1wqtd1@resize_w900_nl.webp" alt="Kit 2 Camiseta Camisa Casal Brazil Frase Criativa Juntos na Copa Brasil" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-15%</span>
+        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Kit 2 Camiseta Camisa Casal Brazil Frase Criativa Juntos na Copa Brasil</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 54,90</span>
+          <span class="preco-original">R$ 64,90</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.8 (468)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/7pqVrkUXIN" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-bs-br.img.susercontent.com/sg-11134201-82602-ml9p6cdxnev501.webp" alt="Kit Copa do Mundo Brasil Carro Capa de Retrovisor Bandeira Capo Bandeirinha janela Verde Amarelo" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-63%</span>
+        <span class="badge-frete frete-gratis">Frete grátis</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Kit Copa do Mundo Brasil Carro Capa de Retrovisor Bandeira Capo Bandeirinha janela Verde Amarelo</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 45,00</span>
+          <span class="preco-original">R$ 120,00</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.9 (592)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/7KuFGU9VQ8" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-bs-br.img.susercontent.com/br-11134207-820lk-mmhirgvn5jbad8.webp" alt="Blusa Feminina Cores Brasil Brasão Copa Do Mundo Gola Redonda Manga Curta Baby Look Poliamida" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-51%</span>
+        <span class="badge-frete frete-gratis">Frete grátis</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Blusa Feminina Cores Brasil Brasão Copa Do Mundo Gola Redonda Manga Curta Baby Look Poliamida</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 26,90</span>
+          <span class="preco-original">R$ 54,90</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.8 (223)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/qglWG5vA1" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-bs-br.img.susercontent.com/br-11134207-820l4-mnee4749bqiobb.webp" alt="Roupa Pet Brasil Copa do Mundo Cachorro e Gato Roupinha da Copa do Brasil Camisa do Brasil" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-42%</span>
+        <span class="badge-frete frete-gratis">Frete grátis</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Roupa Pet Brasil Copa do Mundo Cachorro e Gato Roupinha da Copa do Brasil Camisa do Brasil</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 31,99</span>
+          <span class="preco-original">R$ 55,00</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.8 (129)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/3g0wtLGaCr" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-bs-br.img.susercontent.com/sg-11134201-8261y-mlfabfms7vnlc5.webp" alt="Blusa de frio do brasil moletom canguru torcedor brasileiro masculino e feminino unissex blusa com capuz e bolso" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-12%</span>
+        <span class="badge-frete frete-gratis">Frete grátis</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Blusa de frio do brasil moletom canguru torcedor brasileiro masculino e feminino unissex blusa com capuz e bolso</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 69,99</span>
+          <span class="preco-original">R$ 79,90</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.6 (895)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/4AxDTs1l0v" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-bs-br.img.susercontent.com/sg-11134201-81zwh-mmqggi9rh1c693.webp" alt="Porta Figurinhas Copa Do Mundo Caixa Maleta Organizadora em alto relevo dourado taça da copa 2026" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        
+        <span class="badge-frete frete-gratis">Frete grátis</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Porta Figurinhas Copa Do Mundo Caixa Maleta Organizadora em alto relevo dourado taça da copa 2026</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 40,90</span>
+          
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.5 (996)</span>
+        </div>
+        <a class="btn-comprar" href="Porta Figurinhas Copa Do Mundo Caixa Maleta Organizadora em alto relevo dourado taça da copa 2026" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="esporte">
+      <div class="card-img" style="background:#22c55e15">
+        <img src="https://down-br.img.susercontent.com/file/sg-11134201-820lr-mo25sm1ujtvl26@resize_w900_nl.webp" alt="Álbum Copa Do Mundo FIFA 2026 Brochura + 70 Figurinhas 10 Pacotes Colecionáveis Originais" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-43%</span>
+        <span class="badge-frete frete-gratis">Frete grátis</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Esporte</div>
+        <div class="card-nome">Álbum Copa Do Mundo FIFA 2026 Brochura + 70 Figurinhas 10 Pacotes Colecionáveis Originais</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 39,90</span>
+          <span class="preco-original">R$ 69,90</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.8 (274)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/1BJbtpquGE" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div><div class="card-produto" data-cat="casa">
+      <div class="card-img" style="background:#f59e0b15">
+        <img src="https://mms.img.susercontent.com/br-11134207-820lo-mnpmd5zzb9j695" alt="Copo Térmico 437ml Personalizado Edição Copa do Mundo 2026" onerror="this.style.display='none'">
+        <div class="emoji-placeholder" style="display:none">📦</div>
+        <span class="badge-desconto">-54%</span>
+        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Casa &amp; Utilidades</div>
+        <div class="card-nome">Copo Térmico 437ml Personalizado Edição Copa do Mundo 2026</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ 41,75</span>
+          <span class="preco-original">R$ 89,90</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★</span>
+          <span>4.4 (778)</span>
+        </div>
+        <a class="btn-comprar" href="https://s.shopee.com.br/6pxye6HzOX" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div></div>
+</main>
+
+<!-- CHATBOT -->
+<div id="chat-widget">
+  <div id="chat-box">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar">🤖</div>
+        <div>
+          <div class="chat-nome">ZapBot — IA de Ofertas</div>
+          <div class="chat-status"><span class="dot-online"></span> Online agora</div>
+        </div>
+      </div>
+      <button class="chat-close" onclick="toggleChat()">✕</button>
+    </div>
+    <div id="chat-msgs">
+      <div class="msg msg-bot">Olá! 👋 Sou o <strong>ZapBot</strong>, seu assistente de compras com IA.<br><br>Posso te ajudar a encontrar produtos, comparar preços e tirar dúvidas. O que você procura hoje?</div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chat-input" placeholder="Pergunte sobre produtos..." autocomplete="off" onkeydown="if(event.key==='Enter')enviarMsg()">
+      <button id="btn-enviar" onclick="enviarMsg()">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </div>
+  </div>
+  <button id="chat-toggle" onclick="toggleChat()">
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    <span class="notif-badge"></span>
+  </button>
+</div>
+
+<!-- BOTÃO ADMIN OCULTO -->
+<button id="admin-trigger" onclick="cliqueScreto()"></button>
+
+<!-- MODAL LOGIN -->
+<div id="modal-login" class="">
+  <div class="modal-box">
+    <div class="login-icon">🔐</div>
+    <div class="modal-title" style="justify-content:center">Área restrita</div>
+    <div class="login-desc">Digite a senha para acessar o painel de gerenciamento de produtos.</div>
+    <div class="form-grupo">
+      <label>Senha</label>
+      <input type="password" id="senha-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')verificarSenha()">
+    </div>
+    <button class="btn-salvar" onclick="verificarSenha()">Entrar</button>
+    <div style="text-align:center;margin-top:1rem">
+      <button onclick="fecharLogin()" style="background:none;border:none;color:var(--texto-muted);font-size:.85rem;cursor:pointer">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADMIN -->
+<div id="modal-admin">
+  <div class="modal-box modal-box-lg">
+    <div class="modal-title">
+      ⚙️ Painel do Afiliado
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="admin-logout" onclick="sairAdmin()">Sair</button>
+        <button class="modal-close" onclick="fecharAdmin()">✕</button>
+      </div>
+    </div>
+
+    <div class="info-box">
+      💡 Os produtos que você adicionar aqui ficam salvos neste navegador. Para que todos os visitantes vejam, após salvar, clique em <strong>"Exportar HTML"</strong> e suba o novo arquivo no Netlify.
+    </div>
+
+    <!-- ADICIONAR PRODUTO -->
+    <div class="config-section-title" style="margin-bottom:1rem">➕ Adicionar produto</div>
+    <div class="form-linha">
+      <div class="form-grupo">
+        <label>Nome do produto</label>
+        <input type="text" id="p-nome" placeholder="Copo Térmico 473ml">
+      </div>
+      <div class="form-grupo">
+        <label>Categoria</label>
+        <select id="p-cat">
+          <option value="casa">Casa &amp; Utilidades</option>
+          <option value="eletronicos">Eletrônicos</option>
+          <option value="moda">Moda</option>
+          <option value="beleza">Beleza</option>
+          <option value="esporte">Esporte</option>
+          <option value="infantil">Infantil</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-linha">
+      <div class="form-grupo">
+        <label>Preço atual (R$)</label>
+        <input type="number" id="p-preco" placeholder="41.75" step="0.01">
+      </div>
+      <div class="form-grupo">
+        <label>Preço original (R$)</label>
+        <input type="number" id="p-preco-orig" placeholder="89.90" step="0.01">
+      </div>
+    </div>
+    <div class="form-linha">
+      <div class="form-grupo">
+        <label>Link afiliado Shopee</label>
+        <input type="url" id="p-link" placeholder="https://s.shopee.com.br/...">
+      </div>
+      <div class="form-grupo">
+        <label>Emoji</label>
+        <input type="text" id="p-emoji" placeholder="☕" maxlength="2">
+      </div>
+    </div>
+    <div class="form-linha">
+      <div class="form-grupo">
+        <label>Avaliação (ex: 4.8)</label>
+        <input type="number" id="p-stars" placeholder="4.8" min="1" max="5" step="0.1">
+      </div>
+      <div class="form-grupo">
+        <label>Frete</label>
+        <select id="p-frete">
+          <option value="sim">Grátis</option>
+          <option value="cupom">Grátis com cupom</option>
+          <option value="nao">Pago</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grupo">
+      <label>URL da imagem (opcional)</label>
+      <input type="url" id="p-img" placeholder="https://...">
+    </div>
+    <button class="btn-salvar" onclick="adicionarProduto()">+ Adicionar produto</button>
+
+    <!-- EXPORTAR -->
+    <div class="config-section">
+      <div class="config-section-title">📤 Publicar alterações</div>
+      <p style="font-size:.85rem;color:var(--texto-muted);margin-bottom:1rem">Clique abaixo para baixar o HTML atualizado com todos os produtos. Suba este arquivo no Netlify para publicar as mudanças para todos.</p>
+      <button class="btn-salvar" style="background:var(--preto)" onclick="exportarHTML()">⬇️ Exportar HTML atualizado</button>
+    </div>
+
+    <!-- LISTA DE PRODUTOS -->
+    <div class="config-section">
+      <div class="config-section-title">📦 Produtos cadastrados</div>
+      <div class="lista-produtos-admin" id="lista-admin">
+    <div class="item-admin">
+      <span>📦 Copo Térmico 473ml Personalizado — R$41,75</span>
+      <button class="btn-del" onclick="deletarProduto(0)">✕</button>
+    </div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIGURAÇÕES ──────────────────────────────────────
+const GROQ_KEY = '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';
+const ADMIN_SENHA = 'Lucas2210';
+
+// ── ÁREA SECRETA — 5 cliques para ativar ──────────────
+let cliquesSecretos = 0;
+let timerCliques = null;
+function cliqueScreto() {
+  cliquesSecretos++;
+  clearTimeout(timerCliques);
+  timerCliques = setTimeout(() => { cliquesSecretos = 0; }, 2000);
+  if (cliquesSecretos >= 5) {
+    cliquesSecretos = 0;
+    abrirLogin();
+  }
+}
+const BOT_CONTEXTO = `Você é o ZapBot, assistente de compras da OfertaZap. Seu objetivo é ajudar clientes a encontrar o melhor produto pelo melhor preço e fechar a compra com confiança.
+
+Personalidade: Seja simpático, animado e use linguagem informal mas profissional. Use emojis com moderação (1-2 por mensagem). Nunca seja robótico ou repetitivo.
+
+Ao receber uma mensagem:
+— Se o cliente não disse o que procura, pergunte de forma curta: "O que você tá precisando hoje? 😊"
+— Se ele der uma categoria, liste os produtos disponíveis nessa categoria com preço e destaque o desconto.
+— Se ele der um orçamento, filtre e recomende apenas o que cabe no valor.
+— Se ele estiver indeciso entre dois produtos, compare brevemente e dê uma recomendação clara.
+
+Ao recomendar produtos:
+— Sempre mencione o desconto em % se houver.
+— Destaque frete grátis quando disponível.
+— Inclua o link de compra e termine com uma frase de incentivo como: "Aproveita, tá voando! 🔥" ou "Estoque limitado, corre lá! 🛒"
+— Quando o produto tiver frete grátis com cupom, mencione isso.
+
+Regras importantes:
+— Nunca invente produtos fora da lista.
+— Nunca prometa prazo de entrega — redirecione para a página da Shopee.
+— Se o cliente reclamar de preço, mostre a economia em reais: "Você economiza R$X comprando agora."
+— Se perguntarem sobre troca, devolução ou garantia, diga: "Para isso, a Shopee tem suporte direto na plataforma — é bem tranquilo! 😉"
+— Nunca mencione outras lojas ou concorrentes.
+
+Para fechar a venda: quando o cliente demonstrar interesse, use frases como "Quer que eu te mande o link direto?" e inclua o link na sequência.`;
+
+// ── PRODUTOS FIXOS (base) ──────────────────────────────
+const PRODUTOS_BASE = [{"id":1780234693822,"nome":"Bandeira Do Brasil Grande 150x90cm Copa Do Mundo Para Bastão","cat":"esporte","preco":29.9,"orig":69.99,"link":"https://s.shopee.com.br/W3vC2gVQi","emoji":"📦","stars":4.9,"frete":"cupom","img":"https://down-br.img.susercontent.com/file/sg-11134201-81zua-mmzww7t14r9fc6@resize_w900_nl.webp"},{"id":1780234037087,"nome":"TOALHA DE MESA COPA DO MUNDO BRASIL FUTEBOL 2,20M x 1,50M PARA 8 CADEIRAS","cat":"esporte","preco":42.38,"orig":0,"link":"https://s.shopee.com.br/3VhWkpw3w3","emoji":"📦","stars":4.8,"frete":"cupom","img":"https://down-br.img.susercontent.com/file/br-11134207-820mc-mnhk2wuajocgc3@resize_w900_nl.webp"},{"id":1780233822881,"nome":"Kit com 3/5/10/12 Pacotes de Figurinha Álbum Copa do Mundo","cat":"esporte","preco":21.39,"orig":21.46,"link":"https://s.shopee.com.br/60OrjAt0aT","emoji":"📦","stars":4.9,"frete":"cupom","img":"https://down-br.img.susercontent.com/file/br-11134207-820m7-mo774inyysqq7b@resize_w900_nl.webp"},{"id":1780233462479,"nome":"12 Adesivos Strass Tatoo Maquiagem Rosto Jogos Copa do Mundo Brasil Bandeira Futebol Adesivo De Pedrinhas Brilhantes","cat":"esporte","preco":19.9,"orig":49.9,"link":"https://s.shopee.com.br/7KuFJ8rFdR","emoji":"📦","stars":3,"frete":"cupom","img":"https://down-br.img.susercontent.com/file/br-11134207-820m8-mntyzxvlmo021e.webp"},{"id":1780233336872,"nome":"Kit 6 Vuvuzelas Bandeira do Brasil Grande Com Apito | Corneta Torcida Copa do Mundo Brasil","cat":"esporte","preco":10.99,"orig":39.99,"link":"https://s.shopee.com.br/W3vAQD7nn","emoji":"📦","stars":4.6,"frete":"cupom","img":"https://down-br.img.susercontent.com/file/br-11134207-820m6-mnr4x4e2egaq5d.webp"},{"id":1780231857538,"nome":"Body Bebê Copa - Brasil - Menino Menina/ Body Bebê Verde e Amarelo Mesverário Brasil Brasileiro","cat":"esporte","preco":22.66,"orig":61.79,"link":"https://s.shopee.com.br/3LO6VvUigx","emoji":"📦","stars":5,"frete":"cupom","img":"https://down-br.img.susercontent.com/file/br-11134207-81ztc-mjdiz80id9mq46@resize_w900_nl.webp"},{"id":1780231694149,"nome":"Conjunto Feminino Brasil Cropped Alcinha Calça Flare Cintura Alta Look Copa Casual","cat":"esporte","preco":69.9,"orig":139.8,"link":"https://s.shopee.com.br/AUrH2vDF5C","emoji":"📦","stars":4.9,"frete":"sim","img":"https://down-bs-br.img.susercontent.com/br-11134207-820ls-mmkdr4curc3q5e.webp"},{"id":1780231545710,"nome":"Camiseta do Brasil Infantil Unissex Personalizada Minha Copa Malha 100% Algodão Estampa Em DTF","cat":"esporte","preco":28.9,"orig":29.9,"link":"https://s.shopee.com.br/2LVZJkh0eb","emoji":"📦","stars":4.8,"frete":"sim","img":"https://down-br.img.susercontent.com/file/br-11134207-820l4-mnbl40wm9ds427@resize_w900_nl.webp"},{"id":1780231390224,"nome":"Kit 2 Camiseta Camisa Casal Brazil Frase Criativa Juntos na Copa Brasil","cat":"esporte","preco":54.9,"orig":64.9,"link":"https://s.shopee.com.br/7pqVrkUXIN","emoji":"📦","stars":4.8,"frete":"cupom","img":"https://down-br.img.susercontent.com/file/sg-11134201-8262o-mmfcxooc1wqtd1@resize_w900_nl.webp"},{"id":1780231068548,"nome":"Kit Copa do Mundo Brasil Carro Capa de Retrovisor Bandeira Capo Bandeirinha janela Verde Amarelo","cat":"esporte","preco":45,"orig":120,"link":"https://s.shopee.com.br/7KuFGU9VQ8","emoji":"📦","stars":4.9,"frete":"sim","img":"https://down-bs-br.img.susercontent.com/sg-11134201-82602-ml9p6cdxnev501.webp"},{"id":1780230879736,"nome":"Blusa Feminina Cores Brasil Brasão Copa Do Mundo Gola Redonda Manga Curta Baby Look Poliamida","cat":"esporte","preco":26.9,"orig":54.9,"link":"https://s.shopee.com.br/qglWG5vA1","emoji":"📦","stars":4.8,"frete":"sim","img":"https://down-bs-br.img.susercontent.com/br-11134207-820lk-mmhirgvn5jbad8.webp"},{"id":1780230762160,"nome":"Roupa Pet Brasil Copa do Mundo Cachorro e Gato Roupinha da Copa do Brasil Camisa do Brasil","cat":"esporte","preco":31.99,"orig":55,"link":"https://s.shopee.com.br/3g0wtLGaCr","emoji":"📦","stars":4.8,"frete":"sim","img":"https://down-bs-br.img.susercontent.com/br-11134207-820l4-mnee4749bqiobb.webp"},{"id":1780230435061,"nome":"Blusa de frio do brasil moletom canguru torcedor brasileiro masculino e feminino unissex blusa com capuz e bolso","cat":"esporte","preco":69.99,"orig":79.9,"link":"https://s.shopee.com.br/4AxDTs1l0v","emoji":"📦","stars":4.6,"frete":"sim","img":"https://down-bs-br.img.susercontent.com/sg-11134201-8261y-mlfabfms7vnlc5.webp"},{"id":1780230328359,"nome":"Porta Figurinhas Copa Do Mundo Caixa Maleta Organizadora em alto relevo dourado taça da copa 2026","cat":"esporte","preco":40.9,"orig":0,"link":"Porta Figurinhas Copa Do Mundo Caixa Maleta Organizadora em alto relevo dourado taça da copa 2026","emoji":"📦","stars":4.5,"frete":"sim","img":"https://down-bs-br.img.susercontent.com/sg-11134201-81zwh-mmqggi9rh1c693.webp"},{"id":1780230130329,"nome":"Álbum Copa Do Mundo FIFA 2026 Brochura + 70 Figurinhas 10 Pacotes Colecionáveis Originais","cat":"esporte","preco":39.9,"orig":69.9,"link":"https://s.shopee.com.br/1BJbtpquGE","emoji":"📦","stars":4.8,"frete":"sim","img":"https://down-br.img.susercontent.com/file/sg-11134201-820lr-mo25sm1ujtvl26@resize_w900_nl.webp"},{"id":1780229812261,"nome":"Copo Térmico 437ml Personalizado Edição Copa do Mundo 2026","cat":"casa","preco":41.75,"orig":89.9,"link":"https://s.shopee.com.br/6pxye6HzOX","emoji":"📦","stars":4.4,"frete":"cupom","img":"https://mms.img.susercontent.com/br-11134207-820lo-mnpmd5zzb9j695"}];
+
+// ── ESTADO ─────────────────────────────────────────────
+let produtos = JSON.parse(localStorage.getItem('ofertazap_v2') || 'null') || [...PRODUTOS_BASE];
+let chatHistorico = [];
+let adminLogado = false;
+let categoriaAtiva = 'todos';
+
+function salvarProdutos(){localStorage.setItem('ofertazap_v2',JSON.stringify(produtos))}
+
+// ── RENDER PRODUTOS ────────────────────────────────────
+function descPct(orig,atual){if(!orig||orig<=atual)return null;return Math.round((1-atual/orig)*100)}
+function estrelas(n){return '★'.repeat(Math.floor(n))+(n%1>=.5?'½':'')}
+function catNome(c){return{eletronicos:'Eletrônicos',moda:'Moda',casa:'Casa & Utilidades',beleza:'Beleza',esporte:'Esporte',infantil:'Infantil'}[c]||c}
+function catCor(c){return{eletronicos:'#3b82f6',moda:'#ec4899',casa:'#f59e0b',beleza:'#8b5cf6',esporte:'#22c55e',infantil:'#f97316'}[c]||'#EE4D2D'}
+
+function renderProdutos(cat='todos'){
+  categoriaAtiva=cat;
+  const lista=cat==='todos'?produtos:produtos.filter(p=>p.cat===cat);
+  document.getElementById('stat-produtos').textContent=produtos.length;
+  document.getElementById('grid-produtos').innerHTML=lista.map(p=>{
+    const desc=descPct(p.orig,p.preco);
+    const freteBadge=p.frete==='sim'
+      ?'<span class="badge-frete frete-gratis">Frete grátis</span>'
+      :p.frete==='cupom'
+      ?'<span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>'
+      :'';
+    return `<div class="card-produto" data-cat="${p.cat}">
+      <div class="card-img" style="background:${catCor(p.cat)}15">
+        ${p.img?`<img src="${p.img}" alt="${p.nome}" onerror="this.style.display='none'">`:'' }
+        <div class="emoji-placeholder" ${p.img?'style="display:none"':''}>${p.emoji||'📦'}</div>
+        ${desc?`<span class="badge-desconto">-${desc}%</span>`:''}
+        ${freteBadge}
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">${catNome(p.cat)}</div>
+        <div class="card-nome">${p.nome}</div>
+        <div class="card-precos">
+          <span class="preco-atual">R$ ${Number(p.preco).toFixed(2).replace('.',',')}</span>
+          ${p.orig?`<span class="preco-original">R$ ${Number(p.orig).toFixed(2).replace('.',',')}</span>`:''}
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">${estrelas(p.stars)}</span>
+          <span>${p.stars} (${Math.floor(Math.random()*900+100)})</span>
+        </div>
+        <a class="btn-comprar" href="${p.link}" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filtrar(cat,btn){
+  document.querySelectorAll('.filtro-btn').forEach(b=>b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  renderProdutos(cat);
+}
+
+// ── LOGIN ADMIN ────────────────────────────────────────
+function abrirLogin(){
+  document.getElementById('senha-input').value='';
+  document.getElementById('modal-login').classList.add('aberto');
+  setTimeout(()=>document.getElementById('senha-input').focus(),100);
+}
+function fecharLogin(){document.getElementById('modal-login').classList.remove('aberto')}
+function verificarSenha(){
+  const s=document.getElementById('senha-input').value;
+  if(s===ADMIN_SENHA){
+    adminLogado=true;
+    fecharLogin();
+    abrirAdmin();
+  } else {
+    const box=document.querySelector('#modal-login .modal-box');
+    box.classList.remove('shake');
+    void box.offsetWidth;
+    box.classList.add('shake');
+    document.getElementById('senha-input').value='';
+    document.getElementById('senha-input').placeholder='Senha incorreta!';
+    setTimeout(()=>document.getElementById('senha-input').placeholder='••••••••',1500);
+  }
+}
+
+// ── ADMIN ──────────────────────────────────────────────
+function abrirAdmin(){
+  if(!adminLogado){abrirLogin();return}
+  renderListaAdmin();
+  document.getElementById('modal-admin').classList.add('aberto');
+}
+function fecharAdmin(){document.getElementById('modal-admin').classList.remove('aberto')}
+function sairAdmin(){adminLogado=false;fecharAdmin()}
+
+function renderListaAdmin(){
+  const el=document.getElementById('lista-admin');
+  if(!produtos.length){el.innerHTML='<p style="color:#999;font-size:.85rem">Nenhum produto ainda.</p>';return}
+  el.innerHTML=produtos.map((p,i)=>`
+    <div class="item-admin">
+      <span>${p.emoji} ${p.nome} — R$${Number(p.preco).toFixed(2).replace('.',',')}</span>
+      <button class="btn-del" onclick="deletarProduto(${i})">✕</button>
+    </div>`).join('');
+}
+
+function adicionarProduto(){
+  const nome=document.getElementById('p-nome').value.trim();
+  const link=document.getElementById('p-link').value.trim();
+  if(!nome||!link){alert('Preencha nome e link afiliado!');return}
+  produtos.unshift({
+    id:Date.now(),nome,
+    cat:document.getElementById('p-cat').value,
+    preco:parseFloat(document.getElementById('p-preco').value)||0,
+    orig:parseFloat(document.getElementById('p-preco-orig').value)||0,
+    link,emoji:document.getElementById('p-emoji').value||'📦',
+    stars:parseFloat(document.getElementById('p-stars').value)||4.5,
+    frete:document.getElementById('p-frete').value,
+    img:document.getElementById('p-img').value.trim()
+  });
+  salvarProdutos();
+  renderProdutos(categoriaAtiva);
+  renderListaAdmin();
+  ['p-nome','p-link','p-preco','p-preco-orig','p-emoji','p-img','p-stars'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('p-frete').value='sim';
+}
+
+function deletarProduto(i){
+  if(!confirm('Remover produto?'))return;
+  produtos.splice(i,1);
+  salvarProdutos();
+  renderProdutos(categoriaAtiva);
+  renderListaAdmin();
+}
+
+// ── EXPORTAR HTML ──────────────────────────────────────
+function exportarHTML(){
+  const html=document.documentElement.outerHTML;
+  const produtosJSON=JSON.stringify(produtos);
+  // injeta produtos atuais na constante PRODUTOS_BASE
+  const atualizado=html.replace(
+    /const PRODUTOS_BASE = \[[\s\S]*?\];/,
+    'const PRODUTOS_BASE = '+produtosJSON+';'
+  );
+  const blob=new Blob([atualizado],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='shopee-afiliado.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── CHATBOT ────────────────────────────────────────────
+function toggleChat(){
+  const box=document.getElementById('chat-box');
+  box.classList.toggle('aberto');
+  if(box.classList.contains('aberto')){
+    document.querySelector('.notif-badge').style.display='none';
+    setTimeout(()=>document.getElementById('chat-input').focus(),100);
+  }
+}
+function addMsg(txt,tipo){
+  const msgs=document.getElementById('chat-msgs');
+  const div=document.createElement('div');
+  div.className=`msg msg-${tipo}`;
+  div.innerHTML=txt.replace(/\n/g,'<br>');
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+async function enviarMsg(){
+  const input=document.getElementById('chat-input');
+  const txt=input.value.trim();
+  if(!txt)return;
+  input.value='';
+  addMsg(txt,'user');
+  const typing=addMsg('Digitando...','typing');
+
+  const listaProdutos=produtos.map(p=>
+    `• ${p.nome} | ${catNome(p.cat)} | R$${Number(p.preco).toFixed(2)} | Frete: ${p.frete==='sim'?'Grátis':p.frete==='cupom'?'Grátis com cupom':'Pago'} | Link: ${p.link}`
+  ).join('\n');
+
+  const systemPrompt=BOT_CONTEXTO+'\n\nPRODUTOS DISPONÍVEIS:\n'+listaProdutos;
+  chatHistorico.push({role:'user',content:txt});
+  if(chatHistorico.length>10)chatHistorico=chatHistorico.slice(-10);
+
+  try{
+    const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+GROQ_KEY},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        messages:[{role:'system',content:systemPrompt},...chatHistorico],
+        max_tokens:500,temperature:.7
+      })
+    });
+    const data=await resp.json();
+    typing.remove();
+    if(data.error){addMsg('❌ Erro: '+data.error.message,'bot');chatHistorico.pop();return}
+    const resposta=data.choices[0].message.content;
+    chatHistorico.push({role:'assistant',content:resposta});
+    addMsg(resposta,'bot');
+  }catch(e){
+    typing.remove();
+    addMsg('❌ Não foi possível conectar. Tente novamente.','bot');
+    chatHistorico.pop();
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────
+renderProdutos();
+document.getElementById('modal-login').addEventListener('click',function(e){if(e.target===this)fecharLogin()});
+document.getElementById('modal-admin').addEventListener('click',function(e){if(e.target===this)fecharAdmin()});
+</script>
+
+
+</body></html>
