@@ -1,6 +1,0 @@
-# Cole aqui os links de afiliado da Shopee, um por linha.
-# O agente adiciona somente links que ainda nao existem no index.html.
-#
-# Exemplo:
-# https://s.shopee.com.br/...
-
