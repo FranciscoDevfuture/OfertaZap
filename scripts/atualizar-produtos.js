@@ -19,19 +19,18 @@ function ehShopee(url) {
 
 async function lerLinksNovos() {
   if (!existsSync(LINKS_PATH)) {
-    await fs.writeFile(LINKS_PATH, "", "utf8");
-    return [];
+    throw new Error("O arquivo links-novos.txt nao existe na raiz do repositorio.");
   }
 
   const texto = await fs.readFile(LINKS_PATH, "utf8");
-  return [...new Set(
-    texto
-      .split(/\r?\n/)
-      .map((linha) => linha.trim())
-      .filter((linha) => linha && !linha.startsWith("#"))
-      .map(normalizarUrl)
-      .filter(ehShopee)
-  )];
+  const links = texto
+    .split(/\r?\n/)
+    .map((linha) => linha.trim())
+    .filter((linha) => linha && !linha.startsWith("#"))
+    .map(normalizarUrl)
+    .filter(ehShopee);
+
+  return [...new Set(links)];
 }
 
 function escaparHtml(valor) {
@@ -44,8 +43,6 @@ function escaparHtml(valor) {
 }
 
 function criarCard(link, numero) {
-  const nome = `Oferta Shopee ${numero}`;
-
   return `
     <div class="card-produto" data-cat="casa">
       <div class="card-img" style="background:#f59e0b15">
@@ -54,7 +51,7 @@ function criarCard(link, numero) {
       </div>
       <div class="card-info">
         <div class="card-categoria">Casa</div>
-        <div class="card-nome">${escaparHtml(nome)}</div>
+        <div class="card-nome">Oferta Shopee ${numero}</div>
         <div class="card-precos">
           <span class="preco-atual">Ver oferta</span>
         </div>
@@ -67,7 +64,25 @@ function criarCard(link, numero) {
     </div>`;
 }
 
+function inserirCardsNoGrid(html, cards) {
+  const inicioGrid = html.search(/<div[^>]+id=["']grid-produtos["'][^>]*>/i);
+
+  if (inicioGrid === -1) {
+    throw new Error("Nao encontrei o bloco id='grid-produtos' no index.html.");
+  }
+
+  const inicioConteudo = html.indexOf(">", inicioGrid) + 1;
+  const antes = html.slice(0, inicioConteudo);
+  const depois = html.slice(inicioConteudo);
+
+  return `${antes}
+${cards}
+${depois}`;
+}
+
 async function main() {
+  console.log("Iniciando atualizacao do OfertaZap...");
+
   if (!existsSync(INDEX_PATH)) {
     throw new Error("Nao encontrei index.html na raiz do repositorio.");
   }
@@ -75,35 +90,27 @@ async function main() {
   const html = await fs.readFile(INDEX_PATH, "utf8");
   const linksNovos = await lerLinksNovos();
 
+  console.log(`Links validos encontrados: ${linksNovos.length}`);
+
   if (!linksNovos.length) {
-    console.log("Nenhum link novo em links-novos.txt.");
+    console.log("Nenhum link novo para adicionar.");
     return;
   }
 
   const linksParaAdicionar = linksNovos.filter((link) => !html.includes(link));
 
+  console.log(`Links ainda nao presentes no site: ${linksParaAdicionar.length}`);
+
   if (!linksParaAdicionar.length) {
-    console.log("Todos os links de links-novos.txt ja existem no site.");
-    await fs.writeFile(LINKS_PATH, "# Cole aqui novos links da Shopee, um por linha.\n", "utf8");
+    console.log("Todos os links informados ja existem no site.");
     return;
-  }
-
-  const marcadorFinal = "</div>\n</main>";
-  let htmlAtualizado = html;
-
-  if (!htmlAtualizado.includes('id="grid-produtos"') && !htmlAtualizado.includes("id='grid-produtos'")) {
-    throw new Error("Nao encontrei #grid-produtos no index.html.");
   }
 
   const cards = linksParaAdicionar
     .map((link, index) => criarCard(link, index + 1))
     .join("\n");
 
-  if (htmlAtualizado.includes(marcadorFinal)) {
-    htmlAtualizado = htmlAtualizado.replace(marcadorFinal, `${cards}\n  ${marcadorFinal}`);
-  } else {
-    htmlAtualizado = htmlAtualizado.replace("</main>", `${cards}\n</main>`);
-  }
+  const htmlAtualizado = inserirCardsNoGrid(html, cards);
 
   await fs.writeFile(INDEX_PATH, htmlAtualizado, "utf8");
   await fs.writeFile(LINKS_PATH, "# Cole aqui novos links da Shopee, um por linha.\n", "utf8");
@@ -112,6 +119,7 @@ async function main() {
 }
 
 main().catch((erro) => {
-  console.error(erro.message || erro);
+  console.error("Erro ao atualizar produtos:");
+  console.error(erro?.stack || erro?.message || erro);
   process.exit(1);
 });
