@@ -93,8 +93,7 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
 #chat-toggle svg{width:26px;height:26px;fill:none;stroke:white;stroke-width:2}
 .notif-badge{position:absolute;top:2px;right:2px;width:16px;height:16px;background:#22c55e;border-radius:50%;border:2px solid white;display:block}
 
-/* ADMIN - área secreta invisível (5 cliques para ativar) */
-#admin-trigger{position:fixed;bottom:0;left:0;width:60px;height:60px;background:transparent;border:none;cursor:default;z-index:999;opacity:0}
+
 
 /* MODAL LOGIN */
 #modal-login,#modal-admin{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;padding:1rem}
@@ -143,6 +142,7 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
   <div class="logo">Oferta<span>Zap</span></div>
   <nav>
     <a href="#produtos">Ofertas</a>
+    <a href="#" onclick="abrirLogin();return false" style="color:rgba(255,255,255,0.4);font-size:.78rem">🔐 Admin</a>
     <a href="#" class="nav-cta" onclick="toggleChat();return false">💬 Fale com IA</a>
   </nav>
 </header>
@@ -524,7 +524,7 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
 </div>
 
 <!-- BOTÃO ADMIN OCULTO -->
-<button id="admin-trigger" onclick="cliqueScreto()"></button>
+
 
 <!-- MODAL LOGIN -->
 <div id="modal-login" class="">
@@ -544,7 +544,7 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
 </div>
 
 <!-- MODAL ADMIN -->
-<div id="modal-admin">
+<div id="modal-admin" class="aberto">
   <div class="modal-box modal-box-lg">
     <div class="modal-title">
       ⚙️ Painel do Afiliado
@@ -639,20 +639,9 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
 <script>
 // ── CONFIGURAÇÕES ──────────────────────────────────────
 const GROQ_KEY = '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';
-const ADMIN_SENHA = 'Lucas2210';
+const ADMIN_SENHA = 'Lucas2210#';
 
-// ── ÁREA SECRETA — 5 cliques para ativar ──────────────
-let cliquesSecretos = 0;
-let timerCliques = null;
-function cliqueScreto() {
-  cliquesSecretos++;
-  clearTimeout(timerCliques);
-  timerCliques = setTimeout(() => { cliquesSecretos = 0; }, 2000);
-  if (cliquesSecretos >= 5) {
-    cliquesSecretos = 0;
-    abrirLogin();
-  }
-}
+
 const BOT_CONTEXTO = `Você é o ZapBot, assistente de compras da OfertaZap. Seu objetivo é ajudar clientes a encontrar o melhor produto pelo melhor preço e fechar a compra com confiança.
 
 Personalidade: Seja simpático, animado e use linguagem informal mas profissional. Use emojis com moderação (1-2 por mensagem). Nunca seja robótico ou repetitivo.
