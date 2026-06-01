@@ -98,3 +98,20 @@ async function main() {
   const cards = linksParaAdicionar
     .map((link, index) => criarCard(link, index + 1))
     .join("\n");
+
+  if (htmlAtualizado.includes(marcadorFinal)) {
+    htmlAtualizado = htmlAtualizado.replace(marcadorFinal, `${cards}\n  ${marcadorFinal}`);
+  } else {
+    htmlAtualizado = htmlAtualizado.replace("</main>", `${cards}\n</main>`);
+  }
+
+  await fs.writeFile(INDEX_PATH, htmlAtualizado, "utf8");
+  await fs.writeFile(LINKS_PATH, "# Cole aqui novos links da Shopee, um por linha.\n", "utf8");
+
+  console.log(`Produtos adicionados: ${linksParaAdicionar.length}`);
+}
+
+main().catch((erro) => {
+  console.error(erro.message || erro);
+  process.exit(1);
+});
