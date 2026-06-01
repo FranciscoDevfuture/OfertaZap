@@ -1,28 +1,17 @@
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
-import * as cheerio from "cheerio";
 
 const INDEX_PATH = "index.html";
 const LINKS_PATH = "links-novos.txt";
-const SHOPEE_HOSTS = ["shopee.com.br", "s.shopee.com.br"];
-
-const CATEGORIAS = [
-  "eletronicos",
-  "moda",
-  "casa",
-  "beleza",
-  "esporte",
-  "infantil"
-];
 
 function normalizarUrl(url) {
   return String(url || "").trim().replace(/\/+$/, "");
 }
 
-function ehLinkShopee(url) {
+function ehShopee(url) {
   try {
     const host = new URL(url).hostname.replace(/^www\./, "");
-    return SHOPEE_HOSTS.some((permitido) => host === permitido || host.endsWith(`.${permitido}`));
+    return host === "shopee.com.br" || host === "s.shopee.com.br" || host.endsWith(".shopee.com.br");
   } catch {
     return false;
   }
@@ -40,61 +29,72 @@ async function lerLinksNovos() {
       .split(/\r?\n/)
       .map((linha) => linha.trim())
       .filter((linha) => linha && !linha.startsWith("#"))
-      .filter(ehLinkShopee)
       .map(normalizarUrl)
+      .filter(ehShopee)
   )];
 }
 
-function linksExistentes($) {
-  const links = new Set();
-
-  $("a[href]").each((_, el) => {
-    const href = normalizarUrl($(el).attr("href"));
-    if (ehLinkShopee(href)) links.add(href);
-  });
-
-  return links;
+function escaparHtml(valor) {
+  return String(valor || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-async function buscarMetadados(url) {
-  const fallback = {
-    nome: "Produto Shopee",
-    imagem: "",
-    preco: "Ver oferta",
-    precoOriginal: "",
-    categoria: "casa",
-    avaliacao: "4.8",
-    vendas: "novo"
-  };
+function criarCard(link, numero) {
+  const nome = `Oferta Shopee ${numero}`;
 
-  try {
-    const resposta = await fetch(url, {
-      redirect: "follow",
-      headers: {
-        "user-agent": "Mozilla/5.0 OfertaZapBot/1.0",
-        "accept-language": "pt-BR,pt;q=0.9,en;q=0.8"
-      }
-    });
+  return `
+    <div class="card-produto" data-cat="casa">
+      <div class="card-img" style="background:#f59e0b15">
+        <div class="emoji-placeholder">📦</div>
+        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
+      </div>
+      <div class="card-info">
+        <div class="card-categoria">Casa</div>
+        <div class="card-nome">${escaparHtml(nome)}</div>
+        <div class="card-precos">
+          <span class="preco-atual">Ver oferta</span>
+        </div>
+        <div class="card-estrelas">
+          <span class="estrelas">★★★★½</span>
+          <span>4.8 (novo)</span>
+        </div>
+        <a class="btn-comprar" href="${escaparHtml(link)}" target="_blank" rel="nofollow sponsored noopener">🛒 Ver na Shopee</a>
+      </div>
+    </div>`;
+}
 
-    const html = await resposta.text();
-    const $ = cheerio.load(html);
+async function main() {
+  if (!existsSync(INDEX_PATH)) {
+    throw new Error("Nao encontrei index.html na raiz do repositorio.");
+  }
 
-    const nome =
-      $("meta[property='og:title']").attr("content") ||
-      $("meta[name='twitter:title']").attr("content") ||
-      $("title").text() ||
-      fallback.nome;
+  const html = await fs.readFile(INDEX_PATH, "utf8");
+  const linksNovos = await lerLinksNovos();
 
-    const imagem =
-      $("meta[property='og:image']").attr("content") ||
-      $("meta[name='twitter:image']").attr("content") ||
-      "";
+  if (!linksNovos.length) {
+    console.log("Nenhum link novo em links-novos.txt.");
+    return;
+  }
 
-    const descricao =
-      $("meta[property='og:description']").attr("content") ||
-      $("meta[name='description']").attr("content") ||
-      "";
+  const linksParaAdicionar = linksNovos.filter((link) => !html.includes(link));
 
-    return normalizarProdutoComIA({
-      ...fallback,
-      nome: limparTexto(nome),
+  if (!linksParaAdicionar.length) {
+    console.log("Todos os links de links-novos.txt ja existem no site.");
+    await fs.writeFile(LINKS_PATH, "# Cole aqui novos links da Shopee, um por linha.\n", "utf8");
+    return;
+  }
+
+  const marcadorFinal = "</div>\n</main>";
+  let htmlAtualizado = html;
+
+  if (!htmlAtualizado.includes('id="grid-produtos"') && !htmlAtualizado.includes("id='grid-produtos'")) {
+    throw new Error("Nao encontrei #grid-produtos no index.html.");
+  }
+
+  const cards = linksParaAdicionar
+    .map((link, index) => criarCard(link, index + 1))
+    .join("\n");
