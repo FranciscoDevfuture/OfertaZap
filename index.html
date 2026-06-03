@@ -171,46 +171,7 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
 
 <main id="produtos">
   <div class="section-title">🔥 Ofertas em destaque</div>
-  <div class="grid-produtos" id="grid-produtos">
-
-    <div class="card-produto" data-cat="casa">
-      <div class="card-img" style="background:#f59e0b15">
-        <div class="emoji-placeholder">📦</div>
-        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
-      </div>
-      <div class="card-info">
-        <div class="card-categoria">Casa</div>
-        <div class="card-nome">Oferta Shopee 1</div>
-        <div class="card-precos">
-          <span class="preco-atual">Ver oferta</span>
-        </div>
-        <div class="card-estrelas">
-          <span class="estrelas">★★★★½</span>
-          <span>4.8 (novo)</span>
-        </div>
-        <a class="btn-comprar" href="https://s.shopee.com.br/110DmF6qpC" target="_blank" rel="nofollow sponsored noopener">🛒 Ver na Shopee</a>
-      </div>
-    </div>
-
-    <div class="card-produto" data-cat="casa">
-      <div class="card-img" style="background:#f59e0b15">
-        <div class="emoji-placeholder">📦</div>
-        <span class="badge-frete frete-cupom">🏷️ Frete c/ cupom</span>
-      </div>
-      <div class="card-info">
-        <div class="card-categoria">Casa</div>
-        <div class="card-nome">Oferta Shopee 2</div>
-        <div class="card-precos">
-          <span class="preco-atual">Ver oferta</span>
-        </div>
-        <div class="card-estrelas">
-          <span class="estrelas">★★★★½</span>
-          <span>4.8 (novo)</span>
-        </div>
-        <a class="btn-comprar" href="https://s.shopee.com.br/2Vp1YwFKvx" target="_blank" rel="nofollow sponsored noopener">🛒 Ver na Shopee</a>
-      </div>
-    </div>
-<div class="card-produto" data-cat="esporte">
+  <div class="grid-produtos" id="grid-produtos"><div class="card-produto" data-cat="esporte">
       <div class="card-img" style="background:#22c55e15">
         <img src="https://down-br.img.susercontent.com/file/br-11134207-820l6-moy58mc7x2wwaf.webp" alt="Álbum Copa do Mundo 2026 Edições Limitadas Capa Dura - Prata - Tradicional" onerror="this.style.display='none'">
         <div class="emoji-placeholder" style="display:none">📦</div>
@@ -783,7 +744,7 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
 </div>
 
 <!-- MODAL ADMIN -->
-<div id="modal-admin" class="aberto">
+<div id="modal-admin">
   <div class="modal-box modal-box-lg">
     <div class="modal-title">
       ⚙️ Painel do Afiliado
@@ -794,7 +755,7 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
     </div>
 
     <div class="info-box">
-      💡 Os produtos que você adicionar aqui ficam salvos neste navegador. Para que todos os visitantes vejam, após salvar, clique em <strong>"Exportar HTML"</strong> e suba o novo arquivo no Netlify.
+      💡 Configure seu Token e Repositório do GitHub abaixo para publicar automaticamente. Ou use "Exportar HTML" para baixar e subir manualmente.
     </div>
 
     <!-- ADICIONAR PRODUTO -->
@@ -856,11 +817,31 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
     </div>
     <button class="btn-salvar" onclick="adicionarProduto()">+ Adicionar produto</button>
 
-    <!-- EXPORTAR -->
+    <!-- PUBLICAR -->
     <div class="config-section">
-      <div class="config-section-title">📤 Publicar alterações</div>
-      <p style="font-size:.85rem;color:var(--texto-muted);margin-bottom:1rem">Clique abaixo para baixar o HTML atualizado com todos os produtos. Suba este arquivo no Netlify para publicar as mudanças para todos.</p>
-      <button class="btn-salvar" style="background:var(--preto)" onclick="exportarHTML()">⬇️ Exportar HTML atualizado</button>
+      <div class="config-section-title">🐙 Publicar no GitHub Pages (automático)</div>
+      <div class="form-linha">
+        <div class="form-grupo">
+          <label>Usuário GitHub</label>
+          <input type="text" id="gh-user" placeholder="seuusuario" oninput="salvarGhConfig()">
+        </div>
+        <div class="form-grupo">
+          <label>Repositório</label>
+          <input type="text" id="gh-repo" placeholder="ofertazap" oninput="salvarGhConfig()">
+        </div>
+      </div>
+      <div class="form-grupo">
+        <label>Token do GitHub</label>
+        <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx" oninput="salvarGhConfig()">
+      </div>
+      <button class="btn-salvar" onclick="publicarGitHub()" id="btn-publicar">🚀 Publicar no GitHub Pages</button>
+      <div id="gh-status" style="margin-top:.75rem;font-size:.83rem;display:none"></div>
+
+      <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--cinza-medio)">
+        <div class="config-section-title" style="margin-bottom:.75rem">⬇️ Exportar manualmente</div>
+        <p style="font-size:.82rem;color:var(--texto-muted);margin-bottom:.75rem">Baixa o HTML e sobe no GitHub manualmente.</p>
+        <button class="btn-salvar" style="background:var(--preto)" onclick="exportarHTML()">⬇️ Exportar HTML</button>
+      </div>
     </div>
 
     <!-- LISTA DE PRODUTOS -->
@@ -1092,6 +1073,7 @@ function verificarSenha(){
 function abrirAdmin(){
   if(!adminLogado){abrirLogin();return}
   renderListaAdmin();
+  carregarGhConfig();
   document.getElementById('modal-admin').classList.add('aberto');
 }
 function fecharAdmin(){document.getElementById('modal-admin').classList.remove('aberto')}
@@ -1134,6 +1116,50 @@ function deletarProduto(i){
   salvarProdutos();
   renderProdutos(categoriaAtiva);
   renderListaAdmin();
+}
+
+// ── GITHUB CONFIG ───────────────────────────────────────
+function salvarGhConfig(){
+  localStorage.setItem('gh_user', document.getElementById('gh-user').value);
+  localStorage.setItem('gh_repo', document.getElementById('gh-repo').value);
+  localStorage.setItem('gh_token', document.getElementById('gh-token').value);
+}
+function carregarGhConfig(){
+  const u=document.getElementById('gh-user');if(u)u.value=localStorage.getItem('gh_user')||''
+  const r=document.getElementById('gh-repo');if(r)r.value=localStorage.getItem('gh_repo')||''
+  const t=document.getElementById('gh-token');if(t)t.value=localStorage.getItem('gh_token')||''
+}
+async function publicarGitHub(){
+  const status=document.getElementById('gh-status')
+  status.style.display='block'
+  status.innerHTML='⏳ Publicando...'
+  status.style.color='var(--texto-muted)'
+  const user=document.getElementById('gh-user').value.trim()
+  const repo=document.getElementById('gh-repo').value.trim()
+  const token=document.getElementById('gh-token').value.trim()
+  if(!user||!repo||!token){status.innerHTML='❌ Preencha usuário, repositório e token.';status.style.color='#dc2626';return}
+  const html=document.documentElement.outerHTML
+  const produtosJSON=JSON.stringify(produtos)
+  const atualizado=html.replace(/const PRODUTOS_BASE = [\s\S]*?];/,'const PRODUTOS_BASE = '+produtosJSON+';')
+  const base64=btoa(unescape(encodeURIComponent(atualizado)))
+  try{
+    const resp=await fetch(`https://api.github.com/repos/${user}/${repo}/contents/index.html`,{
+      method:'PUT',
+      headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({message:'Atualizar ofertas via painel',content:base64,branch:'main'})
+    })
+    const data=await resp.json()
+    if(data.content){
+      status.innerHTML='✅ Publicado! <a href="https://'+user+'.github.io/'+repo+'" target="_blank" style="color:var(--laranja)">Abrir site ↗</a>'
+      status.style.color='#16a34a'
+    }else{
+      status.innerHTML='❌ Erro: '+(data.message||'desconhecido')
+      status.style.color='#dc2626'
+    }
+  }catch(e){
+    status.innerHTML='❌ Erro de conexão: '+e.message
+    status.style.color='#dc2626'
+  }
 }
 
 // ── EXPORTAR HTML ──────────────────────────────────────
