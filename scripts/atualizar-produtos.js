@@ -71,7 +71,6 @@ async function resolverLink(url) {
 
 // ── Buscar produto via productOfferV2 ──────────────────────────
 async function buscarProduto(shopId, itemId, linkOriginal) {
-  // Query GraphQL conforme documentação (productOfferV2 com shopId + itemId)
   const query = `
     query {
       productOfferV2(
@@ -93,6 +92,7 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
           offerLink
           commissionRate
           price
+          categoryName
         }
         pageInfo {
           page
@@ -105,7 +105,7 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
 
   try {
     const body    = JSON.stringify({ query });
-    const headers = gerarAuthHeader(body);  // payload = body da requisição
+    const headers = gerarAuthHeader(body);
 
     const resp = await fetch(API_URL, {
       method: 'POST',
@@ -135,15 +135,15 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
     const orig  = parseFloat(node.priceMax) > preco ? parseFloat(node.priceMax) : 0;
 
     return {
-      id:     itemId,
-      nome:   node.itemName    || 'Produto Shopee',
+      id:      itemId,
+      nome:    node.itemName     || 'Produto Shopee',
       catNome: node.categoryName || '',
       preco,
       orig,
-      link:   node.offerLink   || linkOriginal,
-      img:    node.imageUrl    || '',
-      stars:  parseFloat(node.ratingStar) || 4.5,
-      sales:  parseInt(node.sales)        || 0,
+      link:    node.offerLink    || linkOriginal,
+      img:     node.imageUrl     || '',
+      stars:   parseFloat(node.ratingStar) || 4.5,
+      sales:   parseInt(node.sales)        || 0,
     };
 
   } catch (e) {
@@ -178,8 +178,8 @@ const CAT_NOMES = {
 };
 
 const CAT_CORES = {
-  eletronicos: '#ec489915', moda: '#ec489915', casa: '#f59e0b15',
-  beleza: '#8b5cf615', esporte: '#22c55e15', infantil: '#f97316015',
+  eletronicos: '#3b82f615', moda: '#ec489915', casa: '#f59e0b15',
+  beleza: '#8b5cf615', esporte: '#22c55e15', infantil: '#f9731615',
 };
 
 // ── Gerar HTML do card (idêntico à estrutura do index.html) ────
@@ -220,10 +220,10 @@ function gerarCard(p) {
               <a class="btn-comprar" href="${p.link}" target="_blank" rel="nofollow">🛒 Ver na Shopee</a>
             </div>
           </div>`;
+}
 
 // ── Atualizar preço de um card já existente ────────────────────
 function atualizarPreco(html, link, novoPreco) {
-  // Localiza o card pelo offerLink e substitui o preço-atual
   const linkEscapado = link.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const re = new RegExp(
     `(href="${linkEscapado}"[\\s\\S]{0,2000}?preco-atual">)R\\$\\s*[\\d,.]+(<\\/span>)`,
@@ -315,7 +315,7 @@ async function main() {
   }
 
   fs.writeFileSync(INDEX, html, 'utf-8');
-  fs.writeFileSync(LINKS_TXT, '', 'utf-8'); // limpa o arquivo após processar
+  fs.writeFileSync(LINKS_TXT, '', 'utf-8');
 
   console.log(`\n🎉 Concluído!`);
   console.log(`   ✅ ${adicionados} adicionado(s)`);
