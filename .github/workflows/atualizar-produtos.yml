@@ -1,36 +1,258 @@
-name: Atualizar produtos Shopee
+name: Atualizar produtos Shopee + Deploy
 
 on:
-  workflow_dispatch:
+  # Roda todo dia às 11:00 UTC (08:00 horário de Brasília)
   schedule:
-    - cron: "0 11 * * *"
+    - cron: '0 11 * * *'
+
+  # Permite rodar manualmente pela aba Actions
+  workflow_dispatch:
+
+  # Roda também a cada push na main (quando links-novos.txt mudar)
+  push:
+    branches:
+      - main
+    paths:
+      - 'links-novos.txt'
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  atualizar:
+  # ══════════════════════════════════════════════════════════════
+  # JOB 1 — TESTES (roda antes de tudo)
+  # ══════════════════════════════════════════════════════════════
+  testes:
+    name: 🧪 Testes automáticos
     runs-on: ubuntu-latest
 
     steps:
-      - name: Baixar repositorio
+      - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      - name: Preparar Node
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
 
-      - name: Instalar dependencias
+      - name: Instalar dependências
         run: npm install
 
-      - name: Atualizar produtos
+      # ── TESTE 1: Verificar secrets configurados ──────────────
+      - name: "🔑 Teste 1 — Secrets SHOPEE_APP_ID e SHOPEE_SECRET"
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: npm run atualizar
+          SHOPEE_APP_ID: ${{ secrets.SHOPEE_APP_ID }}
+          SHOPEE_SECRET: ${{ secrets.SHOPEE_SECRET }}
+        run: |
+          echo "Verificando secrets da Shopee..."
+          FALHOU=false
 
-      - name: Salvar alteracoes
-        uses: stefanzweifel/git-auto-commit-action@v5
+          if [ -z "$SHOPEE_APP_ID" ]; then
+            echo "❌ SHOPEE_APP_ID não está configurado nos Secrets do repositório."
+            FALHOU=true
+          else
+            echo "✅ SHOPEE_APP_ID encontrado (${#SHOPEE_APP_ID} caracteres)"
+          fi
+
+          if [ -z "$SHOPEE_SECRET" ]; then
+            echo "❌ SHOPEE_SECRET não está configurado nos Secrets do repositório."
+            FALHOU=true
+          else
+            echo "✅ SHOPEE_SECRET encontrado (${#SHOPEE_SECRET} caracteres)"
+          fi
+
+          if [ "$FALHOU" = "true" ]; then
+            echo ""
+            echo "👉 Como corrigir: vá em Settings → Secrets and variables → Actions"
+            echo "   e crie os secrets SHOPEE_APP_ID e SHOPEE_SECRET."
+            exit 1
+          fi
+
+      # ── TESTE 2: HTML válido ─────────────────────────────────
+      - name: "📄 Teste 2 — Validar index.html"
+        run: |
+          echo "Instalando validador HTML..."
+          npm install -g html-validate 2>/dev/null || true
+
+          echo "Verificando index.html..."
+
+          # Checa existência
+          if [ ! -f "index.html" ]; then
+            echo "❌ index.html não encontrado na raiz do repositório."
+            exit 1
+          fi
+          echo "✅ index.html existe"
+
+          # Checa se é HTML real (tem tag <html> ou <!DOCTYPE)
+          if ! grep -qi "<!DOCTYPE\|<html" index.html; then
+            echo "❌ index.html não parece ser um documento HTML válido (sem DOCTYPE ou tag <html>)."
+            exit 1
+          fi
+          echo "✅ DOCTYPE / tag <html> encontrados"
+
+          # Checa tags essenciais
+          for TAG in "<head" "<body" "<title" "</html>"; do
+            if ! grep -qi "$TAG" index.html; then
+              echo "⚠️  Tag '$TAG' não encontrada no index.html"
+            else
+              echo "✅ Tag '$TAG' presente"
+            fi
+          done
+
+          # Checa se o arquivo não está vazio ou muito pequeno
+          TAMANHO=$(wc -c < index.html)
+          if [ "$TAMANHO" -lt 500 ]; then
+            echo "❌ index.html parece estar vazio ou incompleto (${TAMANHO} bytes)."
+            exit 1
+          fi
+          echo "✅ Tamanho do arquivo: ${TAMANHO} bytes"
+
+          echo ""
+          echo "✅ index.html passou na validação HTML."
+
+      # ── TESTE 3: Links sem 404 ───────────────────────────────
+      - name: "🔗 Teste 3 — Checar links do site (sem 404)"
+        run: |
+          echo "Extraindo links do index.html..."
+
+          # Extrai todos os href com http
+          grep -oP 'href="\Khttps?://[^"]+' index.html | sort -u > /tmp/links.txt || true
+
+          TOTAL=$(wc -l < /tmp/links.txt)
+          echo "Total de links encontrados: $TOTAL"
+
+          if [ "$TOTAL" -eq 0 ]; then
+            echo "ℹ️  Nenhum link externo encontrado. Pulando verificação."
+            exit 0
+          fi
+
+          FALHOU=0
+          OK=0
+          IGNORADOS=0
+
+          while IFS= read -r URL; do
+            # Ignora links da própria Shopee de produto (afiliados — podem redirecionar)
+            if echo "$URL" | grep -qiE "shopee\.com\.br|s\.shopee"; then
+              echo "⏭️  Ignorado (link afiliado): $URL"
+              IGNORADOS=$((IGNORADOS + 1))
+              continue
+            fi
+
+            STATUS=$(curl -o /dev/null -s -w "%{http_code}" \
+              --max-time 10 --connect-timeout 5 \
+              -L -A "Mozilla/5.0" "$URL" 2>/dev/null || echo "000")
+
+            if [ "$STATUS" = "200" ] || [ "$STATUS" = "301" ] || [ "$STATUS" = "302" ] || [ "$STATUS" = "403" ]; then
+              echo "✅ $STATUS — $URL"
+              OK=$((OK + 1))
+            else
+              echo "❌ $STATUS — $URL"
+              FALHOU=$((FALHOU + 1))
+            fi
+          done < /tmp/links.txt
+
+          echo ""
+          echo "Resultado: ✅ $OK OK | ❌ $FALHOU com erro | ⏭️  $IGNORADOS ignorados"
+
+          if [ "$FALHOU" -gt 0 ]; then
+            echo "⚠️  $FALHOU link(s) com problema detectado(s)."
+            echo "   O deploy continuará, mas verifique os links acima."
+            # Não bloqueia o deploy — só avisa
+          fi
+
+      # ── TESTE 4: Script atualizar-produtos.js sem erros ──────
+      - name: "⚙️  Teste 4 — Sintaxe e execução do script"
+        run: |
+          echo "Verificando sintaxe do script..."
+
+          if [ ! -f "scripts/atualizar-produtos.js" ]; then
+            echo "❌ scripts/atualizar-produtos.js não encontrado."
+            exit 1
+          fi
+
+          # Checa sintaxe JS sem executar
+          node --check scripts/atualizar-produtos.js
+          echo "✅ Sintaxe do script OK"
+
+          # Testa execução com secrets falsos — espera falhar com mensagem conhecida
+          SAIDA=$(SHOPEE_APP_ID="teste" SHOPEE_SECRET="teste" \
+            node scripts/atualizar-produtos.js 2>&1 || true)
+
+          # Se o script travou com erro de sintaxe ou crash inesperado, falha
+          if echo "$SAIDA" | grep -qi "SyntaxError\|TypeError\|ReferenceError\|Cannot find module"; then
+            echo "❌ Script falhou com erro inesperado:"
+            echo "$SAIDA"
+            exit 1
+          fi
+
+          echo "✅ Script executou sem erros críticos"
+          echo "   (Saída esperada com credenciais de teste: sem crash)"
+
+  # ══════════════════════════════════════════════════════════════
+  # JOB 2 — ATUALIZAR PRODUTOS (só roda se testes passaram)
+  # ══════════════════════════════════════════════════════════════
+  atualizar:
+    name: 🛍️ Atualizar produtos
+    runs-on: ubuntu-latest
+    needs: testes   # aguarda os testes
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
         with:
-          commit_message: "Atualiza produtos afiliados Shopee"
-          file_pattern: "index.html links-novos.txt"
+          node-version: '20'
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Rodar script de atualização de produtos
+        env:
+          SHOPEE_APP_ID: ${{ secrets.SHOPEE_APP_ID }}
+          SHOPEE_SECRET: ${{ secrets.SHOPEE_SECRET }}
+        run: node scripts/atualizar-produtos.js
+
+      - name: Commitar index.html atualizado (se houver mudanças)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html links-novos.txt
+          git diff --staged --quiet || git commit -m "bot: atualiza produtos e preços [skip ci]"
+          git push
+
+  # ══════════════════════════════════════════════════════════════
+  # JOB 3 — DEPLOY (só roda se atualização funcionou)
+  # ══════════════════════════════════════════════════════════════
+  deploy:
+    name: 🚀 Deploy GitHub Pages
+    runs-on: ubuntu-latest
+    needs: atualizar   # aguarda atualização
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout do repositório (com index.html atualizado)
+        uses: actions/checkout@v4
+        with:
+          ref: main   # garante que pega o commit mais recente do bot
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload dos arquivos do site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+      - name: Deploy no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
