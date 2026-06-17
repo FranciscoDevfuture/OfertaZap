@@ -47,8 +47,14 @@ function gerarAuthHeader(payload) {
 // Aceita tanto link longo quanto encurtado
 async function resolverLink(url) {
   // 1. Tenta extrair direto da URL (link longo)
+  // Formato: /product/<shopId>/<itemId>
   const m1 = url.match(/\/product\/(\d+)\/(\d+)/);
   if (m1) return { shopId: m1[1], itemId: m1[2] };
+
+  // Formato: -i.<shopId>.<itemId> (ex: shopee.com.br/Nome-do-Produto-i.123.456)
+  const decoded = decodeURIComponent(url);
+  const m2 = decoded.match(/-i\.(\d+)\.(\d+)/);
+  if (m2) return { shopId: m2[1], itemId: m2[2] };
 
   const u = new URL(url);
   const shopIdQs = u.searchParams.get('shopid');
