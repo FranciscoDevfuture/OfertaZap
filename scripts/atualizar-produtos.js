@@ -159,7 +159,7 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
     return {
       id:      itemId,
       nome:    node.shopName     || 'Produto Shopee',
-      catNome: node.shopName + ' ' + (node.itemName || ''),  // usa nome+loja para detectar categoria
+      catNome: linkOriginal + ' ' + (node.shopName || ''),  // usa URL + loja para detectar categoria
       preco,
       orig,
       link:    node.offerLink    || linkOriginal,
@@ -188,7 +188,7 @@ function mapearCategoria(texto) {
   const c = (texto || '').toLowerCase();
 
   // Eletrônicos
-  if (/celular|smartphone|fone|headphone|notebook|tablet|carregador|cabo usb|smartwatch|relógio inteligente|câmera|monitor|teclado|mouse|placa|processador|ssd|hd |memória ram|roteador|impressora|projetor/.test(c)) return 'eletronicos';
+  if (/celular|smartphone|fone|headphone|notebook|tablet|carregador|cabo usb|smartwatch|relógio inteligente|câmera|monitor|teclado|mouse|placa|processador|ssd|hd |memória ram|roteador|impressora|projetor|console|videogame|game|joystick|controle|playstation|xbox|nintendo/.test(c)) return 'eletronicos';
 
   // Moda (roupas, calçados, acessórios)
   if (/vestido|calça|blusa|camiseta|camisa|shorts|saia|casaco|jaqueta|moletom|cropped|biquíni|lingerie|meia|cueca|calcinha|sutiã|pijama|conjunto feminino|conjunto masculino|moda|roupa|look|outfit|tênis|sandália|sapato|bota|chinelo|bolsa|carteira|óculos|boné|chapéu|cinto|lanzinha|lulimod|avance mod|doutora mod/.test(c)) return 'moda';
