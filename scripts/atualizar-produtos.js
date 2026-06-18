@@ -100,15 +100,13 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
   const query = `
     query {
       productOfferV2(
-        input: {
-          shopId: ${shopId}
-          itemId: ${itemId}
-          limit: 1
-        }
+        shopId: ${shopId}
+        itemId: ${itemId}
+        limit: 1
       ) {
         nodes {
           itemId
-          itemName
+          commissionRate
           priceMin
           priceMax
           ratingStar
@@ -116,9 +114,7 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
           imageUrl
           shopName
           offerLink
-          commissionRate
           price
-          categoryName
         }
         pageInfo {
           page
@@ -162,8 +158,8 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
 
     return {
       id:      itemId,
-      nome:    node.itemName     || 'Produto Shopee',
-      catNome: node.categoryName || '',
+      nome:    node.shopName     || 'Produto Shopee',
+      catNome: '',  // productOfferV2 não retorna categoryName
       preco,
       orig,
       link:    node.offerLink    || linkOriginal,
