@@ -43,29 +43,49 @@ function gerarAuthHeader(payload) {
   };
 }
 
-// ── Resolver link encurtado → shopId + itemId ──────────────────
+// ── Resolver link → shopId + itemId ───────────────────────────
+// Aceita tanto link longo quanto encurtado
 async function resolverLink(url) {
+  // 1. Tenta extrair direto da URL (link longo)
+  // Formato: /product/<shopId>/<itemId>
+  const m1 = url.match(/\/product\/(\d+)\/(\d+)/);
+  if (m1) return { shopId: m1[1], itemId: m1[2] };
+
+  // Formato: -i.<shopId>.<itemId> (ex: shopee.com.br/Nome-do-Produto-i.123.456)
+  const decoded = decodeURIComponent(url);
+  const m2 = decoded.match(/-i\.(\d+)\.(\d+)/);
+  if (m2) return { shopId: m2[1], itemId: m2[2] };
+
+  const u = new URL(url);
+  const shopIdQs = u.searchParams.get('shopid');
+  const itemIdQs = u.searchParams.get('itemid');
+  if (shopIdQs && itemIdQs) return { shopId: shopIdQs, itemId: itemIdQs };
+
+  // 2. Tenta seguir redirect (link encurtado s.shopee.com.br)
   try {
     const resp = await fetch(url, {
-      method: 'HEAD',
+      method: 'GET',
       redirect: 'follow',
-      headers: { 'User-Agent': 'Mozilla/5.0' },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 Chrome/91.0.4472.120 Mobile Safari/537.36',
+        'Accept-Language': 'pt-BR,pt;q=0.9',
+      },
     });
     const final = resp.url;
+    console.log(`  🔀 Redirect para: ${final}`);
 
-    // Formato longo: /product/<shopId>/<itemId>
-    const m1 = final.match(/\/product\/(\d+)\/(\d+)/);
-    if (m1) return { shopId: m1[1], itemId: m1[2] };
+    const m2 = final.match(/\/product\/(\d+)\/(\d+)/);
+    if (m2) return { shopId: m2[1], itemId: m2[2] };
 
-    // Query string: ?shopid=&itemid=
-    const u = new URL(final);
-    const shopId = u.searchParams.get('shopid');
-    const itemId = u.searchParams.get('itemid');
+    const uf = new URL(final);
+    const shopId = uf.searchParams.get('shopid');
+    const itemId = uf.searchParams.get('itemid');
     if (shopId && itemId) return { shopId, itemId };
 
   } catch (e) {
     console.warn(`  ⚠️  Não foi possível resolver: ${url} — ${e.message}`);
   }
+
   return null;
 }
 
@@ -327,3 +347,4 @@ main().catch(err => {
   console.error('💥 Erro fatal:', err);
   process.exit(1);
 });
+
