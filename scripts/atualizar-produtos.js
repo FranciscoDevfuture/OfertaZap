@@ -46,7 +46,8 @@ function gerarAuthHeader(payload) {
 // ── Resolver link → shopId + itemId ───────────────────────────
 // Aceita tanto link longo quanto encurtado
 async function resolverLink(url) {
-  // 1. Tenta extrair direto da URL (link longo)
+  // 1. Tenta extrair direto da URL (vários formatos)
+
   // Formato: /product/<shopId>/<itemId>
   const m1 = url.match(/\/product\/(\d+)\/(\d+)/);
   if (m1) return { shopId: m1[1], itemId: m1[2] };
@@ -56,6 +57,11 @@ async function resolverLink(url) {
   const m2 = decoded.match(/-i\.(\d+)\.(\d+)/);
   if (m2) return { shopId: m2[1], itemId: m2[2] };
 
+  // Formato: /shopname/<shopId>/<itemId> (ex: shopee.com.br/opaanlp/123/456)
+  const m3 = url.match(/shopee\.com\.br\/[^\/]+\/(\d+)\/(\d+)/);
+  if (m3) return { shopId: m3[1], itemId: m3[2] };
+
+  // Formato: query string ?shopid=&itemid=
   const u = new URL(url);
   const shopIdQs = u.searchParams.get('shopid');
   const itemIdQs = u.searchParams.get('itemid');
