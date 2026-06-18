@@ -159,7 +159,7 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
     return {
       id:      itemId,
       nome:    node.shopName     || 'Produto Shopee',
-      catNome: '',  // productOfferV2 não retorna categoryName
+      catNome: node.shopName + ' ' + (node.itemName || ''),  // usa nome+loja para detectar categoria
       preco,
       orig,
       link:    node.offerLink    || linkOriginal,
@@ -183,14 +183,26 @@ function linksExistentes(html) {
   return links;
 }
 
-// ── Mapear categoria ───────────────────────────────────────────
-function mapearCategoria(cat) {
-  const c = (cat || '').toLowerCase();
-  if (c.includes('eletrôn') || c.includes('eletron') || c.includes('celular') || c.includes('inform')) return 'eletronicos';
-  if (c.includes('moda') || c.includes('roupa') || c.includes('vestido') || c.includes('calça') || c.includes('blusa')) return 'moda';
-  if (c.includes('beleza') || c.includes('skin') || c.includes('cabelo') || c.includes('perfume')) return 'beleza';
-  if (c.includes('esporte') || c.includes('fitness') || c.includes('futebol')) return 'esporte';
-  if (c.includes('infantil') || c.includes('bebê') || c.includes('brinquedo')) return 'infantil';
+// ── Mapear categoria pelo nome do produto + loja ───────────────
+function mapearCategoria(texto) {
+  const c = (texto || '').toLowerCase();
+
+  // Eletrônicos
+  if (/celular|smartphone|fone|headphone|notebook|tablet|carregador|cabo usb|smartwatch|relógio inteligente|câmera|monitor|teclado|mouse|placa|processador|ssd|hd |memória ram|roteador|impressora|projetor/.test(c)) return 'eletronicos';
+
+  // Moda (roupas, calçados, acessórios)
+  if (/vestido|calça|blusa|camiseta|camisa|shorts|saia|casaco|jaqueta|moletom|cropped|biquíni|lingerie|meia|cueca|calcinha|sutiã|pijama|conjunto feminino|conjunto masculino|moda|roupa|look|outfit|tênis|sandália|sapato|bota|chinelo|bolsa|carteira|óculos|boné|chapéu|cinto|lanzinha|lulimod|avance mod|doutora mod/.test(c)) return 'moda';
+
+  // Beleza
+  if (/maquiagem|batom|base|pó facial|máscara de cílios|sombra|blush|perfume|desodorante|shampoo|condicionador|sérum|hidratante|creme|esfoliante|protetor solar|cabelo|unha|escova|pente|secador|prancha|beleza|cosmétic|skincare/.test(c)) return 'beleza';
+
+  // Esporte
+  if (/futebol|copa|brasil|torcida|bicicleta|ergométrica|esteira|haltere|musculação|academia|fitness|esporte|tênis esportivo|chuteira|uniforme|kit torcedor|bandeira brasil|vuvuzela|álbum copa|figurinha/.test(c)) return 'esporte';
+
+  // Infantil
+  if (/infantil|criança|bebê|menino|menina|brinquedo|fidget|boneca|carrinho|lego|escolar|mochila infantil|body bebê|roupa infantil|kit bebê/.test(c)) return 'infantil';
+
+  // Casa & Utilidades (fallback)
   return 'casa';
 }
 
