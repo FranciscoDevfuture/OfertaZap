@@ -74,8 +74,8 @@ async function resolverLink(url) {
     const final = resp.url;
     console.log(`  🔀 Redirect para: ${final}`);
 
-    const m2 = final.match(/\/product\/(\d+)\/(\d+)/);
-    if (m2) return { shopId: m2[1], itemId: m2[2] };
+    const m4 = final.match(/\/product\/(\d+)\/(\d+)/);
+    if (m4) return { shopId: m4[1], itemId: m4[2] };
 
     const uf = new URL(final);
     const shopId = uf.searchParams.get('shopid');
