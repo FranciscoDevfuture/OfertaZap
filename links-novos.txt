@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 https://shopee.com.br/Jaqueta-Masculina-Forrada-Peluciada-do-P-ao-G6-i.845467748.19853883873?extraParams=%7B%22display_model_id%22%3A179416566194%2C%22model_selection_logic%22%3A3%7D
 
 
@@ -14,3 +15,5 @@ https://shopee.com.br/Kit-2-Camisetas-Masculina-Manga-Longa-Gola-Alta-Cacharrel-
 https://shopee.com.br/kit3-Camiseta-Masculina-Rodeio-Texas-Estilo-Country-i.1419020674.19499712913?extraParams=%7B%22display_model_id%22%3A169412777533%2C%22model_selection_logic%22%3A3%7D
 
 https://shopee.com.br/Cal%C3%A7a-Jeans-Masculina-Premium-Tradicional-e-Alta-Qualidade-i.1079083566.23696973145?extraParams=%7B%22display_model_id%22%3A189588720796%2C%22model_selection_logic%22%3A3%7D
+=======
+>>>>>>> 4f366012ea03a30a546dac0f2340fcf3bc05461b
