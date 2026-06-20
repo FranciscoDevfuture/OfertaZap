@@ -9252,20 +9252,33 @@ async function enviarMsg() {
   addMsg(txt, 'user');
   const typing = addMsg('Digitando...', 'typing');
 
-  // Lê produtos direto do HTML
+  // Lê produtos direto do HTML (limita para não estourar tokens da API)
   const cards = document.querySelectorAll('.card-produto');
-  const listaProdutos = Array.from(cards).map(card => {
-    const nome  = card.querySelector('.card-nome')?.textContent || '';
+  const palavrasMsg = txt.toLowerCase();
+
+  // Tenta achar produtos relevantes à pergunta primeiro
+  let cardsRelevantes = Array.from(cards).filter(card => {
+    const nome = (card.querySelector('.card-nome')?.textContent || '').toLowerCase();
+    const cat  = (card.dataset.cat || '').toLowerCase();
+    return palavrasMsg.split(' ').some(p => p.length > 3 && (nome.includes(p) || cat.includes(p)));
+  });
+
+  // Se não achou nada relevante, usa os primeiros produtos do site
+  let cardsParaEnviar = cardsRelevantes.length > 0 ? cardsRelevantes : Array.from(cards);
+  cardsParaEnviar = cardsParaEnviar.slice(0, 25); // limite de segurança
+
+  const listaProdutos = cardsParaEnviar.map(card => {
+    const nome  = (card.querySelector('.card-nome')?.textContent || '').slice(0, 80);
     const preco = card.querySelector('.preco-atual')?.textContent || '';
     const link  = card.querySelector('.btn-comprar')?.href || '';
     const frete = card.querySelector('.frete-gratis') ? 'Grátis'
-                : card.querySelector('.frete-cupom')  ? 'Grátis com cupom' : 'Pago';
-    return `• ${nome} | ${preco} | Frete: ${frete} | Link: ${link}`;
+                : card.querySelector('.frete-cupom')  ? 'Grátis c/ cupom' : 'Pago';
+    return `• ${nome} | ${preco} | Frete: ${frete} | ${link}`;
   }).join('\n');
 
-  const systemPrompt = BOT_CONTEXTO + '\n\nPRODUTOS DISPONÍVEIS:\n' + listaProdutos;
+  const systemPrompt = BOT_CONTEXTO + '\n\nPRODUTOS DISPONÍVEIS (mostrando ' + cardsParaEnviar.length + ' de ' + cards.length + '):\n' + listaProdutos;
   chatHistorico.push({ role: 'user', content: txt });
-  if (chatHistorico.length > 10) chatHistorico = chatHistorico.slice(-10);
+  if (chatHistorico.length > 6) chatHistorico = chatHistorico.slice(-6);
 
   try {
     const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
