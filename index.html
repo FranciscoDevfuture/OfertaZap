@@ -36,6 +36,13 @@ nav a:hover{color:var(--branco)}
 
 .filtro-bar{background:var(--branco);border-bottom:1px solid var(--cinza-medio);padding:.75rem 2rem;display:flex;align-items:center;gap:.75rem;overflow-x:auto;scrollbar-width:none}
 .filtro-bar::-webkit-scrollbar{display:none}
+.busca-bar{background:var(--branco);border-bottom:1px solid var(--cinza-medio);padding:1rem 2rem;display:flex;justify-content:center}
+.busca-wrap{position:relative;width:100%;max-width:480px}
+.busca-input{width:100%;border:1.5px solid var(--cinza-medio);border-radius:100px;padding:11px 44px 11px 18px;font-family:'DM Sans',sans-serif;font-size:.9rem;color:var(--texto);outline:none;transition:border-color .2s}
+.busca-input:focus{border-color:var(--laranja)}
+.busca-icone{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--texto-muted);pointer-events:none}
+.busca-vazio{display:none;text-align:center;padding:3rem 1rem;color:var(--texto-muted)}
+.busca-vazio.mostrar{display:block}
 .filtro-label{font-size:.8rem;color:var(--texto-muted);white-space:nowrap;font-weight:500;margin-right:4px}
 .filtro-btn{border:1px solid var(--cinza-medio);background:var(--branco);color:var(--texto);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:6px 14px;border-radius:100px;cursor:pointer;white-space:nowrap;transition:all .2s;font-weight:400}
 .filtro-btn:hover,.filtro-btn.ativo{background:var(--laranja);border-color:var(--laranja);color:var(--branco)}
@@ -126,6 +133,13 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
   </div>
 </div>
 
+<div class="busca-bar">
+  <div class="busca-wrap">
+    <input type="text" id="busca-input" class="busca-input" placeholder="Buscar produto pelo nome..." oninput="buscarProdutos(this.value)" onkeydown="if(event.key==='Enter')event.preventDefault()">
+    <svg class="busca-icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+  </div>
+</div>
+
 <div class="filtro-bar">
   <span class="filtro-label">Filtrar:</span>
   <button class="filtro-btn ativo" onclick="filtrar('todos',this)">Todos</button>
@@ -135,6 +149,12 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
   <button class="filtro-btn" onclick="filtrar('beleza',this)">Beleza</button>
   <button class="filtro-btn" onclick="filtrar('esporte',this)">Esporte</button>
   <button class="filtro-btn" onclick="filtrar('infantil',this)">Infantil</button>
+</div>
+
+<div class="busca-vazio" id="busca-vazio">
+  <p style="font-size:2.5rem;margin-bottom:.5rem">🔍</p>
+  <p style="font-weight:500">Nenhum produto encontrado</p>
+  <p style="font-size:.85rem;margin-top:4px">Tente buscar com outras palavras</p>
 </div>
 
 <main id="produtos">
@@ -9882,17 +9902,39 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
 // ── CONFIGURAÇÕES ──────────────────────────────────────
 const ADMIN_SENHA = 'Lucas2210#';
 
-// ── FILTRO (lê direto do HTML) ─────────────────────────
+// ── FILTRO + BUSCA (lê direto do HTML) ─────────────────
+let categoriaAtual = 'todos';
+
 function filtrar(cat, btn) {
   document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('ativo'));
   btn.classList.add('ativo');
+  categoriaAtual = cat;
+  aplicarFiltros();
+}
+
+function buscarProdutos(termo) {
+  aplicarFiltros(termo);
+}
+
+function aplicarFiltros(termoBusca) {
+  const busca = (termoBusca !== undefined ? termoBusca : document.getElementById('busca-input').value)
+    .trim().toLowerCase();
+  let visiveis = 0;
+
   document.querySelectorAll('.card-produto').forEach(card => {
-    if (cat === 'todos' || card.dataset.cat === cat) {
+    const nome = (card.querySelector('.card-nome')?.textContent || '').toLowerCase();
+    const bateCategoria = categoriaAtual === 'todos' || card.dataset.cat === categoriaAtual;
+    const bateBusca = busca === '' || nome.includes(busca);
+
+    if (bateCategoria && bateBusca) {
       card.style.display = '';
+      visiveis++;
     } else {
       card.style.display = 'none';
     }
   });
+
+  document.getElementById('busca-vazio').classList.toggle('mostrar', visiveis === 0);
 }
 
 // ── CONTADOR DE PRODUTOS ───────────────────────────────
