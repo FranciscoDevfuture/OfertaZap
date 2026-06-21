@@ -106,6 +106,7 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
       ) {
         nodes {
           itemId
+          productName
           commissionRate
           priceMin
           priceMax
@@ -158,8 +159,8 @@ async function buscarProduto(shopId, itemId, linkOriginal) {
 
     return {
       id:      itemId,
-      nome:    node.shopName     || 'Produto Shopee',
-      catNome: linkOriginal + ' ' + (node.shopName || ''),  // usa URL + loja para detectar categoria
+      nome:    node.productName  || node.shopName || 'Produto Shopee',
+      catNome: (node.productName || '') + ' ' + linkOriginal,  // usa nome do produto + URL para detectar categoria
       preco,
       orig,
       link:    node.offerLink    || linkOriginal,
