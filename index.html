@@ -65,36 +65,6 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
 .btn-comprar{display:block;width:100%;background:var(--laranja);color:var(--branco);border:none;border-radius:10px;padding:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;text-align:center;text-decoration:none;transition:background .2s;margin-top:auto}
 .btn-comprar:hover{background:var(--laranja-escuro)}
 
-/* CHAT */
-#chat-widget{position:fixed;bottom:24px;right:24px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end}
-#chat-box{width:360px;background:var(--branco);border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,.18);overflow:hidden;display:none;flex-direction:column;margin-bottom:12px;max-height:520px}
-#chat-box.aberto{display:flex}
-.chat-header{background:var(--laranja);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
-.chat-header-info{display:flex;align-items:center;gap:10px}
-.chat-avatar{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
-.chat-nome{font-weight:600;color:var(--branco);font-size:.9rem}
-.chat-status{font-size:.72rem;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:4px}
-.dot-online{width:6px;height:6px;background:#a3ffcb;border-radius:50%}
-.chat-close{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;font-size:1.3rem;line-height:1;transition:color .2s}
-.chat-close:hover{color:var(--branco)}
-#chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#fafaf9;min-height:280px;max-height:340px}
-.msg{max-width:82%;font-size:.86rem;line-height:1.5;padding:9px 13px;border-radius:14px;word-break:break-word}
-.msg-bot{background:var(--branco);color:var(--texto);align-self:flex-start;border:1px solid var(--cinza-medio);border-bottom-left-radius:4px}
-.msg-user{background:var(--laranja);color:var(--branco);align-self:flex-end;border-bottom-right-radius:4px}
-.msg-typing{background:var(--branco);color:var(--texto-muted);align-self:flex-start;border:1px solid var(--cinza-medio);font-style:italic;font-size:.8rem}
-.chat-input-area{display:flex;gap:8px;padding:12px;border-top:1px solid var(--cinza-medio);background:var(--branco)}
-#chat-input{flex:1;border:1px solid var(--cinza-medio);border-radius:100px;padding:9px 16px;font-family:'DM Sans',sans-serif;font-size:.85rem;outline:none;color:var(--texto);transition:border-color .2s}
-#chat-input:focus{border-color:var(--laranja)}
-#btn-enviar{background:var(--laranja);border:none;border-radius:50%;width:38px;height:38px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
-#btn-enviar:hover{background:var(--laranja-escuro)}
-#btn-enviar svg{width:16px;height:16px;fill:none;stroke:white;stroke-width:2}
-#chat-toggle{width:58px;height:58px;background:var(--laranja);border:none;border-radius:50%;cursor:pointer;box-shadow:0 4px 20px rgba(238,77,45,.45);display:flex;align-items:center;justify-content:center;transition:transform .2s,background .2s;position:relative}
-#chat-toggle:hover{transform:scale(1.08);background:var(--laranja-escuro)}
-#chat-toggle svg{width:26px;height:26px;fill:none;stroke:white;stroke-width:2}
-.notif-badge{position:absolute;top:2px;right:2px;width:16px;height:16px;background:#22c55e;border-radius:50%;border:2px solid white;display:block}
-
-
-
 /* MODAL LOGIN */
 #modal-login,#modal-admin{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;padding:1rem}
 #modal-login.aberto,#modal-admin.aberto{display:flex}
@@ -130,7 +100,6 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
   main{padding:1.5rem 1rem 5rem}
   .hero{padding:2.5rem 1rem 2rem}
   .grid-produtos{grid-template-columns:repeat(2,1fr);gap:.75rem}
-  #chat-box{width:calc(100vw - 32px)}
   nav a:not(.nav-cta){display:none}
   .form-linha{grid-template-columns:1fr}
 }
@@ -143,14 +112,13 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
   <nav>
     <a href="#produtos">Ofertas</a>
     <a href="#" onclick="abrirLogin();return false" style="color:rgba(255,255,255,0.4);font-size:.78rem">🔐 Admin</a>
-    <a href="#" class="nav-cta" onclick="toggleChat();return false">💬 Fale com IA</a>
   </nav>
 </header>
 
 <div class="hero">
   <div class="hero-badge">Afiliado Shopee Oficial</div>
   <h1>Melhores ofertas<br>em <em>um só lugar</em></h1>
-  <p>Produtos selecionados com os melhores preços da Shopee. Nossa IA te ajuda a encontrar o que você precisa.</p>
+  <p>Produtos selecionados com os melhores preços da Shopee.</p>
   <div class="hero-stats">
     <div class="stat"><div class="stat-num" id="stat-produtos">8</div><div class="stat-label">produtos</div></div>
     <div class="stat"><div class="stat-num">Até 80%</div><div class="stat-label">de desconto</div></div>
@@ -9754,35 +9722,6 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
     </div></div>
 </main>
 
-<!-- CHATBOT -->
-<div id="chat-widget">
-  <div id="chat-box" class="">
-    <div class="chat-header">
-      <div class="chat-header-info">
-        <div class="chat-avatar">🤖</div>
-        <div>
-          <div class="chat-nome">ZapBot — IA de Ofertas</div>
-          <div class="chat-status"><span class="dot-online"></span> Online agora</div>
-        </div>
-      </div>
-      <button class="chat-close" onclick="toggleChat()">✕</button>
-    </div>
-    <div id="chat-msgs">
-      <div class="msg msg-bot">Olá! 👋 Sou o <strong>ZapBot</strong>, seu assistente de compras com IA.<br><br>Posso te ajudar a encontrar produtos, comparar preços e tirar dúvidas. O que você procura hoje?</div>
-    <div class="msg msg-user">oi</div><div class="msg msg-bot">O que você tá precisando hoje? 😊</div><div class="msg msg-user">ola</div><div class="msg msg-bot">O que você tá precisando hoje? 😊</div><div class="msg msg-user">estou precisando de roupa femininas</div><div class="msg msg-bot">Temos várias opções de roupas femininas! Aqui estão algumas sugestões:<br><br>* Conjuntos Lanzinhas Feminino: R$ 59,99, frete grátis com cupom<br>* Calça Jogger Feminina: R$ 59,93, frete grátis com cupom<br>* Calça Feminina Cargo: R$ 67,50, frete grátis com cupom<br>* Vestido lastex manga bufante: R$ 57,61, frete grátis com cupom<br>* Vestido Elegante Feminino Midi: R$ 70,99, frete grátis com cupom<br><br>Qual tipo de roupa você está procurando? Quer que eu te mostre mais opções?</div></div>
-    <div class="chat-input-area">
-      <input type="text" id="chat-input" placeholder="Pergunte sobre produtos..." autocomplete="off" onkeydown="if(event.key==='Enter')enviarMsg()">
-      <button id="btn-enviar" onclick="enviarMsg()">
-        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-      </button>
-    </div>
-  </div>
-  <button id="chat-toggle" onclick="toggleChat()">
-    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-    <span class="notif-badge" style="display: none;"></span>
-  </button>
-</div>
-
 <!-- BOTÃO ADMIN OCULTO -->
 
 
@@ -9942,31 +9881,6 @@ main{max-width:1280px;margin:0 auto;padding:2.5rem 2rem 6rem}
 <script>
 // ── CONFIGURAÇÕES ──────────────────────────────────────
 const ADMIN_SENHA = 'Lucas2210#';
-
-const BOT_CONTEXTO = `Você é o ZapBot, assistente de compras da OfertaZap. Seu objetivo é ajudar clientes a encontrar o melhor produto pelo melhor preço e fechar a compra com confiança.
-
-Personalidade: Seja simpático, animado e use linguagem informal mas profissional. Use emojis com moderação (1-2 por mensagem). Nunca seja robótico ou repetitivo.
-
-Ao receber uma mensagem:
-— Se o cliente não disse o que procura, pergunte de forma curta: "O que você tá precisando hoje? 😊"
-— Se ele der uma categoria, liste os produtos disponíveis nessa categoria com preço e destaque o desconto.
-— Se ele der um orçamento, filtre e recomende apenas o que cabe no valor.
-— Se ele estiver indeciso entre dois produtos, compare brevemente e dê uma recomendação clara.
-
-Ao recomendar produtos:
-— Sempre mencione o desconto em % se houver.
-— Destaque frete grátis quando disponível.
-— Inclua o link de compra e termine com uma frase de incentivo como: "Aproveita, tá voando! 🔥" ou "Estoque limitado, corre lá! 🛒"
-— Quando o produto tiver frete grátis com cupom, mencione isso.
-
-Regras importantes:
-— Nunca invente produtos fora da lista.
-— Nunca prometa prazo de entrega — redirecione para a página da Shopee.
-— Se o cliente reclamar de preço, mostre a economia em reais: "Você economiza R$X comprando agora."
-— Se perguntarem sobre troca, devolução ou garantia, diga: "Para isso, a Shopee tem suporte direto na plataforma — é bem tranquilo! 😉"
-— Nunca mencione outras lojas ou concorrentes.
-
-Para fechar a venda: quando o cliente demonstrar interesse, use frases como "Quer que eu te mande o link direto?" e inclua o link na sequência.`;
 
 // ── FILTRO (lê direto do HTML) ─────────────────────────
 function filtrar(cat, btn) {
@@ -10161,87 +10075,6 @@ function exportarHTML() {
   a.download = 'ofertazap.html';
   a.click();
   URL.revokeObjectURL(a.href);
-}
-
-// ── CHATBOT ────────────────────────────────────────────
-const GROQ_KEY = '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';
-let chatHistorico = [];
-
-function toggleChat() {
-  const box = document.getElementById('chat-box');
-  box.classList.toggle('aberto');
-  if (box.classList.contains('aberto')) {
-    document.querySelector('.notif-badge').style.display = 'none';
-    setTimeout(() => document.getElementById('chat-input').focus(), 100);
-  }
-}
-function addMsg(txt, tipo) {
-  const msgs = document.getElementById('chat-msgs');
-  const div = document.createElement('div');
-  div.className = `msg msg-${tipo}`;
-  div.innerHTML = txt.replace(/\n/g, '<br>');
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  return div;
-}
-async function enviarMsg() {
-  const input = document.getElementById('chat-input');
-  const txt = input.value.trim();
-  if (!txt) return;
-  input.value = '';
-  addMsg(txt, 'user');
-  const typing = addMsg('Digitando...', 'typing');
-
-  // Lê produtos direto do HTML (limita para não estourar tokens da API)
-  const cards = document.querySelectorAll('.card-produto');
-  const palavrasMsg = txt.toLowerCase();
-
-  // Tenta achar produtos relevantes à pergunta primeiro
-  let cardsRelevantes = Array.from(cards).filter(card => {
-    const nome = (card.querySelector('.card-nome')?.textContent || '').toLowerCase();
-    const cat  = (card.dataset.cat || '').toLowerCase();
-    return palavrasMsg.split(' ').some(p => p.length > 3 && (nome.includes(p) || cat.includes(p)));
-  });
-
-  // Se não achou nada relevante, usa os primeiros produtos do site
-  let cardsParaEnviar = cardsRelevantes.length > 0 ? cardsRelevantes : Array.from(cards);
-  cardsParaEnviar = cardsParaEnviar.slice(0, 25); // limite de segurança
-
-  const listaProdutos = cardsParaEnviar.map(card => {
-    const nome  = (card.querySelector('.card-nome')?.textContent || '').slice(0, 80);
-    const preco = card.querySelector('.preco-atual')?.textContent || '';
-    const link  = card.querySelector('.btn-comprar')?.href || '';
-    const frete = card.querySelector('.frete-gratis') ? 'Grátis'
-                : card.querySelector('.frete-cupom')  ? 'Grátis c/ cupom' : 'Pago';
-    return `• ${nome} | ${preco} | Frete: ${frete} | ${link}`;
-  }).join('\n');
-
-  const systemPrompt = BOT_CONTEXTO + '\n\nPRODUTOS DISPONÍVEIS (mostrando ' + cardsParaEnviar.length + ' de ' + cards.length + '):\n' + listaProdutos;
-  chatHistorico.push({ role: 'user', content: txt });
-  if (chatHistorico.length > 6) chatHistorico = chatHistorico.slice(-6);
-
-  try {
-    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [{ role: 'system', content: systemPrompt }, ...chatHistorico],
-        max_tokens: 500,
-        temperature: .7
-      })
-    });
-    const data = await resp.json();
-    typing.remove();
-    if (data.error) { addMsg('❌ Erro: ' + data.error.message, 'bot'); chatHistorico.pop(); return; }
-    const resposta = data.choices[0].message.content;
-    chatHistorico.push({ role: 'assistant', content: resposta });
-    addMsg(resposta, 'bot');
-  } catch(e) {
-    typing.remove();
-    addMsg('❌ Não foi possível conectar. Tente novamente.', 'bot');
-    chatHistorico.pop();
-  }
 }
 
 // ── INIT ───────────────────────────────────────────────
