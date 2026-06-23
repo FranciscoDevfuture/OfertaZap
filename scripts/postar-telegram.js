@@ -118,7 +118,13 @@ async function enviarTexto(base, texto) {
       disable_web_page_preview: false,
     }),
   });
-  return resp.json();
+  const data = await resp.json();
+  if (!data.ok) {
+    console.error('  🔍 Resposta completa da API:', JSON.stringify(data));
+    console.error('  🔍 chat_id usado:', CHAT_ID);
+    console.error('  🔍 Token (primeiros 20 chars):', TOKEN?.slice(0, 20));
+  }
+  return data;
 }
 
 // ── Aguardar entre mensagens ───────────────────────────
