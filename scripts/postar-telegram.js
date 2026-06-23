@@ -14,7 +14,7 @@ import path from 'path';
 import { JSDOM } from 'jsdom';
 
 const TOKEN     = process.env.TELEGRAM_TOKEN;
-const CHAT_ID   = process.env.TELEGRAM_CHAT || '@ZapOferta';
+const CHAT_ID   = process.env.TELEGRAM_CHAT || '-1004412875557';
 const INDEX     = path.resolve('index.html');
 const MAX_POST  = 5; // quantos produtos postar por vez
 
