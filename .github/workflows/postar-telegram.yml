@@ -1,0 +1,39 @@
+name: Postar ofertas no Telegram
+
+on:
+  # Todo dia às 12:00 UTC (09:00 Brasília)
+  schedule:
+    - cron: '0 12 * * *'
+
+  # Todo dia às 22:00 UTC (19:00 Brasília)
+  # schedule:
+  #   - cron: '0 22 * * *'
+
+  # Permite rodar manualmente
+  workflow_dispatch:
+
+jobs:
+  postar:
+    name: 📢 Postar no Telegram
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Instalar jsdom
+        run: npm install jsdom
+
+      - name: Postar ofertas no canal
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT: '@ZapOferta'
+        run: node scripts/postar-telegram.js
