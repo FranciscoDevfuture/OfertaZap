@@ -67,7 +67,7 @@ function formatarMensagem(p) {
   const desconto = p.desc ? `📉 ${p.desc} de desconto\n` : '';
   const original = p.orig ? `~~${p.orig}~~ → ` : '';
 
-  return `${emojiCat(p.cat)} *${p.nome}*\n\n💰 ${original}*${p.preco}*\n${desconto}${frete}\n\n🛒 [Comprar na Shopee](${p.link})\n\n📲 Mais ofertas: franciscodevfuture.github.io/OfertaZap`;
+  return `${emojiCat(p.cat)} *${p.nome}*\n\n💰 ${original}*${p.preco}*\n${desconto}${frete}\n\n🛒 [Comprar na Shopee](${p.link})\n\n📲 Mais ofertas: https://da.gd/OfertazZap`;
 }
 
 // ── Formatar mensagem com lista de produtos ────────────
@@ -76,7 +76,7 @@ function formatarListagem(produtos) {
     `${i + 1}️⃣ ${emojiCat(p.cat)} *${p.nome.slice(0, 60)}${p.nome.length > 60 ? '...' : ''}* — ${p.preco}${p.desc ? ` (${p.desc})` : ''}`
   ).join('\n');
 
-  return `🔥 *MELHORES OFERTAS DE HOJE*\n\n${itens}\n\n🔗 Ver todas as ofertas:\nfranciscodevfuture.github.io/OfertaZap\n\n💬 Manda pra quem tá precisando economizar\\! 👇`;
+  return `🔥 *MELHORES OFERTAS DE HOJE*\n\n${itens}\n\n🔗 Ver todas as ofertas:\nhttps://da.gd/OfertazZap\n\n💬 Manda pra quem tá precisando economizar! 👇`;
 }
 
 // ── Enviar mensagem via Telegram API ──────────────────
